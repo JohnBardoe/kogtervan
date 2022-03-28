@@ -1,0 +1,21 @@
+name: Deployment
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  run:
+    timeout-minutes: 1 #this should be enough to start, the bot itself detaches afterwards
+    runs-on: lizin servak 
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Kill all running instances of the bot
+        run: ps aux | grep bot.py | awk '{print $2}' | xargs kill -9 | true
+
+      - name: Start the bot
+        run: python3 main.py 
