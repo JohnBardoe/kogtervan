@@ -1,9 +1,10 @@
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, CallbackContext
 from pymongo import MongoClient
-import creds
+import os
 
-updater = Updater(creds.token, use_context=True)
+
+updater = Updater(os.environ.get("TELEGRAM_TOKEN"), use_context=True)
 #mongo_client = MongoClient("mongodb://localhost:1651/")
 
 #create start callback
