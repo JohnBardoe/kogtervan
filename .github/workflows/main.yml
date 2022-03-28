@@ -10,7 +10,7 @@ on:
 jobs:
   run:
     timeout-minutes: 1 #this should be enough to start, the bot itself detaches afterwards
-    runs-on: lizin servak 
+    runs-on: liza 
     steps:
       - uses: actions/checkout@v2
 
