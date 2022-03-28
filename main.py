@@ -8,11 +8,12 @@ def run_bot():
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     while True:
         line = p.stdout.readline()
+        err = p.stdout.read()
         if "Started" in line.decode("utf-8") and p.poll() is None:
             print("Bot started")
             exit(0)
         elif p.poll() is not None:
-            print("Bot failed to start:", p.stderr.read().decode("utf-8"))
+            print("Bot failed to start:", err.decode("utf-8"))
             exit(1)
         sleep(1)
 
