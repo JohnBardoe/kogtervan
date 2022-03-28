@@ -8,7 +8,6 @@ on:
   workflow_dispatch:
 
 jobs:
-
   install-deps:
     runs-on: liza
     steps:
@@ -17,18 +16,18 @@ jobs:
       - name: Install python dependencies
         run: python3 -m pip install -r requirements.txt
 
-
-  run:
+  execute:
     timeout-minutes: 1 #this should be enough to start, the bot itself detaches afterwards
     runs-on: liza 
     steps:
-      env:
-        TELEGRAM_TOKEN: ${{secrets.TELEGRAM_TOKEN}}
+      
 
       - uses: actions/checkout@v2
 
       - name: Kill all running instances of the bot
-        run: ps aux | grep bot.py | awk '{print $2}' | xargs kill -9 | true
+       run: ps aux | grep bot.py | awk '{print $2}' | xargs kill -9 | true
 
       - name: Start the bot
+        env:
+          TELEGRAM_TOKEN: ${{secrets.TELEGRAM_TOKEN}}
         run: python3 main.py 
