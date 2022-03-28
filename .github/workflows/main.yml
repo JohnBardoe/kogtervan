@@ -18,12 +18,13 @@ jobs:
         run: python3 -m pip install -r requirements.txt
 
 
-
-
   run:
     timeout-minutes: 1 #this should be enough to start, the bot itself detaches afterwards
     runs-on: liza 
     steps:
+      env:
+        TELEGRAM_TOKEN: ${{secrets.TELEGRAM_TOKEN}}
+
       - uses: actions/checkout@v2
 
       - name: Kill all running instances of the bot
