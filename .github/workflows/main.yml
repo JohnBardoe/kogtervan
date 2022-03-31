@@ -20,8 +20,7 @@ jobs:
     timeout-minutes: 1 #this should be enough to start, the bot itself detaches afterwards
     runs-on: liza 
     steps:
-      - name: Checkout repo 
-       uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
       - name: Kill all running instances of the bot
        run: ps aux | grep bot.py | awk '{print $2}' | xargs kill -9 | true
