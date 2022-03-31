@@ -4,6 +4,8 @@ from pymongo import MongoClient
 import os
 
 
+print(os.environ.get("TELEGRAM_TOKEN"))
+
 updater = Updater(os.environ.get("TELEGRAM_TOKEN"), use_context=True)
 #mongo_client = MongoClient("mongodb://localhost:1651/")
 
