@@ -28,7 +28,5 @@ jobs:
         run: ps aux | grep bot.py | awk '{print $2}' | xargs kill -9 | true
 
       - name: Start the bot
-        env:
-          TELEGRAM_TOKEN: ${{secrets.TELEGRAM_TOKEN}}
         run: bash start.sh 
 
