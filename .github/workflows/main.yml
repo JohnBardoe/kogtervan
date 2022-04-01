@@ -8,13 +8,13 @@ on:
   workflow_dispatch:
 
 jobs:
-  install-deps:
-    runs-on: liza
-    steps:
-      - name: Install system dependencies
-        run: yum install -y python3 python3-pip
-      - name: Install python dependencies
-        run: python3 -m pip install -r requirements.txt
+#  install-deps:
+#    runs-on: liza
+#    steps:
+#      - name: Install system dependencies
+#        run: yum install -y python3 python3-pip
+#      - name: Install python dependencies
+#        run: python3 -m pip install -r requirements.txt
 
   execute:
     timeout-minutes: 1 #this should be enough to start, the bot itself detaches afterwards
@@ -28,4 +28,4 @@ jobs:
       - name: Start the bot
         env:
           TELEGRAM_TOKEN: ${{secrets.TELEGRAM_TOKEN}}
-        run: python3 main.py 
+        run: echo $TELEGRAM_TOKEN && python3 main.py 
