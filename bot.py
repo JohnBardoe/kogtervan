@@ -4,8 +4,6 @@ from pymongo import MongoClient
 import os
 
 
-print(os.environ.get("TELEGRAM_TOKEN"))
-
 updater = Updater(os.environ.get("TELEGRAM_TOKEN"), use_context=True)
 #mongo_client = MongoClient("mongodb://localhost:1651/")
 
@@ -17,8 +15,8 @@ def main():
     print("Registering handlers...")
     start_handler = CommandHandler('start', start)
     updater.dispatcher.add_handler(start_handler)
-    print("Started")
     updater.start_polling()
+    print("Started")
     updater.idle()
 
 if __name__ == '__main__':

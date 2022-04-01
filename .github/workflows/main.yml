@@ -28,4 +28,4 @@ jobs:
       - name: Start the bot
         env:
           TELEGRAM_TOKEN: ${{secrets.TELEGRAM_TOKEN}}
-        run: echo $TELEGRAM_TOKEN && python3 main.py 
+        run: bash start.sh 
