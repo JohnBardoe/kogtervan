@@ -19,6 +19,8 @@ jobs:
   execute:
     timeout-minutes: 1 #this should be enough to start, the bot itself detaches afterwards
     runs-on: liza 
+    env:
+      TELEGRAM_TOKEN: ${{secrets.TELEGRAM_TOKEN}}
     steps:
       - uses: actions/checkout@v2
 
@@ -26,6 +28,4 @@ jobs:
         run: ps aux | grep bot.py | awk '{print $2}' | xargs kill -9 | true
 
       - name: Start the bot
-        env:
-          TELEGRAM_TOKEN: ${{secrets.TELEGRAM_TOKEN}}
         run: echo $TELEGRAM_TOKEN && python3 main.py 
