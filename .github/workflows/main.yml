@@ -28,4 +28,4 @@ jobs:
         run: ps aux | grep bot.py | awk '{print $2}' | xargs kill -9 | true
 
       - name: Start the bot
-        run: echo $TELEGRAM_TOKEN && python3 main.py 
+        run: python3 main.py 
