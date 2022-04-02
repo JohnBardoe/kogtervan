@@ -49,8 +49,8 @@ def error_handler(update: object, context: CallbackContext) -> None:
 def start(update: Update, context: CallbackContext) -> str:
     reply_markup = InlineKeyboardMarkup(
         [
-            InlineKeyboardButton("Зарегистрируй меня!", callback_data="1"),
-            InlineKeyboardButton("Я бы нашел кого себе...", callback_data="2"),
+            [InlineKeyboardButton("Зарегистрируй меня!", callback_data="1")],
+            [InlineKeyboardButton("Я бы нашел кого себе...", callback_data="2")],
         ]
     )
     update.message.reply_text(
