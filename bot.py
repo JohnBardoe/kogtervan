@@ -1,5 +1,5 @@
-from telegram import Update
-from telegram.ext import Updater, CommandHandler, CallbackContext
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
+from telegram.ext import Updater, CommandHandler, CallbackContext, CallbackQueryHandler
 from pymongo import MongoClient
 import os
 
