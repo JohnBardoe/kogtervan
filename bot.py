@@ -71,12 +71,12 @@ def select_city(update: Update, context: CallbackContext) -> str:
     if PURPOSE == 1:
         text = "Выбери город, где ты сейчас находишься"
 
-    update.message.reply_text(
+    update.edit_message_text(
         text,
         reply_markup=InlineKeyboardMarkup(
             [
-                InlineKeyboardButton("Москва", callback_data="1"),
-                InlineKeyboardButton("Санкт-Петербург", callback_data="2"),
+                [InlineKeyboardButton("Москва", callback_data="2")],
+                [InlineKeyboardButton("Санкт-Петербург", callback_data="2")],
             ]
         ),
     )
@@ -85,14 +85,13 @@ def select_city(update: Update, context: CallbackContext) -> str:
 
 def registerHandlers():
     print("Registering handlers...")
-    # create dispatcher
+    
     dp = updater.dispatcher
-    # create 2 stage conversation handler
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler("start", start)],
         states={
             # select city based on purpose
-            PURPOSE: [CallbackQueryHandler(select_city)]
+            CITY: [CallbackQueryHandler(select_city)]
         },
         fallbacks=[CommandHandler("start", start)],
     )
