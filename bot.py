@@ -9,7 +9,7 @@ from telegram.ext import (
     ConversationHandler,
 )
 from pymongo import MongoClient
-import os
+import os, traceback
 
 EXCEPTION_CHAT_ID = 328982832
 PURPOSE, CITY = range(2)
