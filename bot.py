@@ -4,11 +4,13 @@ from pymongo import MongoClient
 import os
 
 
+
+PURPOSE, CITY = range(2)
 updater = Updater(os.environ.get("TELEGRAM_TOKEN"), use_context=True)
 # mongo_client = MongoClient("mongodb://localhost:1651/")
 
 # create
-def start(update: Update, context: CallbackContext) -> None:
+def start(update: Update, context: CallbackContext) -> int:
     update.message.reply_text(
         f"Привет {update.effective_user.first_name}! Ты тут зачем?",
         reply_markup=InlineKeyboardMarkup(
@@ -18,6 +20,7 @@ def start(update: Update, context: CallbackContext) -> None:
             ]
         ),
     )
+    return PURPOSE
 
 
 def button(update: Update, context: CallbackContext) -> None:
@@ -25,14 +28,23 @@ def button(update: Update, context: CallbackContext) -> None:
     query.answer()
     query.edit_message_text(text=f"Selected option: {query.data}")
 
-# create callback for registration
-def select_city(update: Update, context: CallbackContext) -> None:
-    update.message.reply_text(
-        "Выбери город:",
-        reply_markup=ReplyKeyboardMarkup(["Москва", "Санкт-Петербург", "Новосибирск"]),
-    )
-    return select_city_2
 
+def select_city(update: Update, context: CallbackContext) -> None:
+    text = "Выбери город, где будешь искать друзей"
+    if PURPOSE == 1:
+        text = "Выбери город, где ты сейчас находишься"
+        
+
+    update.message.reply_text(
+        text,
+        reply_markup=InlineKeyboardMarkup(
+            [
+                InlineKeyboardButton("Москва", callback_data="1"),
+                InlineKeyboardButton("Санкт-Петербург", callback_data="2"),
+            ]
+        ),
+    )
+    return CITY
 
 def registerHandlers():
     print("Registering handlers...")
@@ -42,8 +54,8 @@ def registerHandlers():
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler("start", start)],
         states={
-            select_city: [MessageHandler(Filters.text, select_city)],
-            select_city_2: [MessageHandler(Filters.text, select_city_2)],
+            #select city based on purpose
+            PURPOSE: [CallbackQueryHandler(select_city)]
         },
         fallbacks=[CommandHandler("start", start)],
     )
