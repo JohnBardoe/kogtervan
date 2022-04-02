@@ -45,21 +45,14 @@ def error_handler(update: object, context: CallbackContext) -> None:
     # Finally, send the message
     context.bot.send_message(EXCEPTION_CHAT_ID, message, parse_mode=ParseMode.HTML)
 
-
 def start(update: Update, context: CallbackContext) -> str:
-   reply_markup=InlineKeyboardMarkup(
+    reply_markup=InlineKeyboardMarkup(
         [
             InlineKeyboardButton("Зарегистрируй меня!", callback_data="1"),
             InlineKeyboardButton("Я бы нашел кого себе...", callback_data="2"),
         ]
     ) 
-   update.message.reply_text(
-        f"Привет {update.effective_user.first_name}! Ты тут зачем?",
-        reply_markup=reply_markup,
-    )
-    #create inline keyboard markup with 2 buttons
-    
-
+    update.message.reply_text(f"Привет {update.effective_user.first_name}! Ты тут зачем?", reply_markup=reply_markup)
     return PURPOSE
 
 
