@@ -17,8 +17,11 @@ from telegram.ext import (
 from pymongo import MongoClient
 import os, traceback, html, json
 
-EXCEPTION_CHAT_ID = 328982832
+########STRUCTURE########
 PURPOSE, CITY = range(2)
+#########################
+
+EXCEPTION_CHAT_ID = 328982832
 updater = Updater(os.environ.get("TELEGRAM_TOKEN"), use_context=True)
 # mongo_client = MongoClient("mongodb://localhost:1651/")
 
@@ -51,8 +54,8 @@ def start(update: Update, context: CallbackContext) -> str:
         f"Привет {update.effective_user.first_name}! Ты тут зачем?",
         reply_markup=InlineKeyboardMarkup(
             [
-                InlineKeyboardButton("Зарегистрируй меня!", callback_data="1"),
-                InlineKeyboardButton("Я бы нашел кого себе...", callback_data="2"),
+                "Зарегистрируй меня!",
+                "Я бы нашел кого себе..."
             ]
         ),
     )
