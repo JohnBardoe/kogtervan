@@ -2,7 +2,7 @@
 
 > /tmp/bot.log # clear log (or create it)
 
-python3 -u bot.py &> /tmp/bot.log & disown
+RUNNER_TRACKING_ID="" && python3 -u bot.py &> /tmp/bot.log & disown
 
 echo "Entering loop"
 # wait for word Started in log and check if bot is running
