@@ -27,14 +27,11 @@ updater = Updater(os.environ.get("TELEGRAM_TOKEN"), use_context=True)
 
 
 def error_handler(update: object, context: CallbackContext) -> None:
-    # list of strings rather than a single string, so we have to join them together.
     tb_list = traceback.format_exception(
         None, context.error, context.error.__traceback__
     )
     tb_string = "".join(tb_list)
 
-    # Build the message with some markup and additional information about what happened.
-    # You might need to add some logic to deal with messages longer than the 4096 character limit.
     update_str = update.to_dict() if isinstance(update, Update) else str(update)
     message = (
         f"An exception was raised while handling an update\n"
@@ -50,15 +47,19 @@ def error_handler(update: object, context: CallbackContext) -> None:
 
 
 def start(update: Update, context: CallbackContext) -> str:
-    update.message.reply_text(
+   reply_markup=InlineKeyboardMarkup(
+        [
+            InlineKeyboardButton("Зарегистрируй меня!", callback_data="1"),
+            InlineKeyboardButton("Я бы нашел кого себе...", callback_data="2"),
+        ]
+    ) 
+   update.message.reply_text(
         f"Привет {update.effective_user.first_name}! Ты тут зачем?",
-        reply_markup=InlineKeyboardMarkup(
-            [
-                "Зарегистрируй меня!",
-                "Я бы нашел кого себе..."
-            ]
-        ),
+        reply_markup=reply_markup,
     )
+    #create inline keyboard markup with 2 buttons
+    
+
     return PURPOSE
 
 
@@ -68,7 +69,7 @@ def button(update: Update, context: CallbackContext) -> None:
     query.edit_message_text(text=f"Selected option: {query.data}")
 
 
-def select_city(update: Update, context: CallbackContext) -> None:
+def select_city(update: Update, context: CallbackContext) -> str:
     text = "Выбери город, где будешь искать друзей"
     if PURPOSE == 1:
         text = "Выбери город, где ты сейчас находишься"
@@ -101,7 +102,6 @@ def registerHandlers():
 
     # register handler
     dp.add_handler(conv_handler)
-    dp.add_handler(CallbackQueryHandler(button))
     dp.add_error_handler(error_handler)
 
 
