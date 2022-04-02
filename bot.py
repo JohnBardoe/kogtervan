@@ -1,4 +1,10 @@
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, ParseMode
+from telegram import (
+    Update,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    CallbackQuery,
+    ParseMode,
+)
 from telegram.ext import (
     Updater,
     CommandHandler,
@@ -19,23 +25,26 @@ updater = Updater(os.environ.get("TELEGRAM_TOKEN"), use_context=True)
 
 def error_handler(update: object, context: CallbackContext) -> None:
     # list of strings rather than a single string, so we have to join them together.
-    tb_list = traceback.format_exception(None, context.error, context.error.__traceback__)
-    tb_string = ''.join(tb_list)
+    tb_list = traceback.format_exception(
+        None, context.error, context.error.__traceback__
+    )
+    tb_string = "".join(tb_list)
 
     # Build the message with some markup and additional information about what happened.
     # You might need to add some logic to deal with messages longer than the 4096 character limit.
     update_str = update.to_dict() if isinstance(update, Update) else str(update)
     message = (
-        f'An exception was raised while handling an update\n'
-        f'<pre>update = {html.escape(json.dumps(update_str, indent=2, ensure_ascii=False))}'
-        '</pre>\n\n'
-        f'<pre>context.chat_data = {html.escape(str(context.chat_data))}</pre>\n\n'
-        f'<pre>context.user_data = {html.escape(str(context.user_data))}</pre>\n\n'
-        f'<pre>{html.escape(tb_string)}</pre>'
+        f"An exception was raised while handling an update\n"
+        f"<pre>update = {html.escape(json.dumps(update_str, indent=2, ensure_ascii=False))}"
+        "</pre>\n\n"
+        f"<pre>context.chat_data = {html.escape(str(context.chat_data))}</pre>\n\n"
+        f"<pre>context.user_data = {html.escape(str(context.user_data))}</pre>\n\n"
+        f"<pre>{html.escape(tb_string)}</pre>"
     )
 
     # Finally, send the message
     context.bot.send_message(EXCEPTION_CHAT_ID, message, parse_mode=ParseMode.HTML)
+
 
 def start(update: Update, context: CallbackContext) -> str:
     update.message.reply_text(
@@ -91,6 +100,7 @@ def registerHandlers():
     dp.add_handler(conv_handler)
     dp.add_handler(CallbackQueryHandler(button))
     dp.add_error_handler(error_handler)
+
 
 def main():
     registerHandlers()
