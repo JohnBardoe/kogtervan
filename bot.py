@@ -119,7 +119,7 @@ def start(update: Update, context: CallbackContext) -> str:
 
 def select_city(update: Update, context: CallbackContext) -> str:
     user_id = update.message.from_user.id
-    
+    print(update.message.text, update.callback_query.data)
     if update.message.text:
         city = update.message.text
     else:
@@ -398,7 +398,6 @@ def registerHandlers():
             REGISTER: [register_handler],
             SEARCH: [search_handler]
         },
-        allow_reentry=True,
         fallbacks=[CommandHandler("cancel", cancel)]
     )
 
