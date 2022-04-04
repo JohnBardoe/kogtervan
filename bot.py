@@ -124,14 +124,14 @@ def select_city(update: Update, context: CallbackContext) -> str:
     close_matches = difflib.get_close_matches(city, list_of_cities, n=3, cutoff=0.8)
 
     # if there is no results
-    if not close_matches.count():
+    if not len(close_matches):
         update.message.reply_text(
             "Такого города нет в базе. Попробуй еще раз"
         )
         return CITY_SELECT
 
     # if there is more than one result
-    if close_matches.count() > 1:
+    elif len(close_matches) > 1:
         update.message.reply_text(
             "Найдено несколько городов. Выбери один из них"
         )
