@@ -27,7 +27,9 @@ SEARCH_JOB, SEARCH_RENT, SEARCH_PEOPLE, DELETE = range(4)
 CITY_SELECT, HOBBY, SKIP_HOBBY, JOB, SKIP_JOB, PHOTO, SKIP_PHOTO = range(7)
 EMPLOYEE, EMPLOYER = range(2)
 ROOM, ROOMMATE = range(2)
+AUTO, TAGS = range(2)
 #########################
+
 
 EXCEPTION_CHAT_ID = 328982832
 updater = Updater(os.environ.get("TELEGRAM_TOKEN"), use_context=True)
@@ -264,10 +266,6 @@ def cancel(update: Update, context: CallbackContext) -> str:
     return ConversationHandler.END
 
 
-def ask_rent(update: Update, context: CallbackContext) -> str:
-    return ConversationHandler.END
-
-
 def ask_job(update: Update, context: CallbackContext) -> str:
     return ConversationHandler.END
 
@@ -280,6 +278,10 @@ def select_employer(update: Update, context: CallbackContext) -> str:
     return ConversationHandler.END
 
 
+def ask_rent_type(update: Update, context: CallbackContext) -> str:
+    return ConversationHandler.END
+
+
 def select_room(update: Update, context: CallbackContext) -> str:
     return ConversationHandler.END
 
@@ -288,12 +290,32 @@ def select_roommate(update: Update, context: CallbackContext) -> str:
     return ConversationHandler.END
 
 
+def ask_people(update: Update, context: CallbackContext) -> str:
+    return ConversationHandler.END
+
+
+def select_person_auto(update: Update, context: CallbackContext) -> str:
+    return ConversationHandler.END
+
+
+def select_person_tags(update: Update, context: CallbackContext) -> str:
+    return ConversationHandler.END
+
+
 def registerHandlers():
     print("Registering handlers...")
     dp = updater.dispatcher
+    search_people_handler = ConversationHandler(
+        entry_points=[MessageHandler(Filters.text, ask_people)],
+        states={
+            AUTO: [MessageHandler(Filters.text, select_room)],
+            TAGS: [MessageHandler(Filters.text, select_roommate)],
+        },
+        fallbacks=[CommandHandler('cancel', cancel)]
+    )
 
     search_rent_handler = ConversationHandler(
-        entry_points=[MessageHandler(Filters.text, ask_rent)],
+        entry_points=[MessageHandler(Filters.text, ask_rent_type)],
         states={
             ROOM: [MessageHandler(Filters.text, select_room)],
             ROOMMATE: [MessageHandler(Filters.text, select_roommate)],
