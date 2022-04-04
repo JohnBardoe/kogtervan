@@ -153,8 +153,8 @@ def select_hobby(update: Update, context: CallbackContext) -> str:
     # if message is longer than 300 symbols
     if len(update.message.text) > 300:
         update.message.reply_text(
-                "Текст не должен быть длиннее 300 символов"
-            )
+            "Текст не должен быть длиннее 300 символов"
+        )
         return HOBBY
     elif len(update.message.text) == 0:
         update.message.reply_text(
@@ -181,14 +181,15 @@ def skip_hobby(update: Update, context: CallbackContext) -> str:
     )
     return JOB
 
+
 def select_job(update: Update, context: CallbackContext) -> str:
-    user_id=update.message.from_user.id
-    job=update.message.text
+    user_id = update.message.from_user.id
+    job = update.message.text
     # if message is longer than 300 symbols
     if len(update.message.text) > 300:
         update.message.reply_text(
-                "Текст не должен быть длиннее 300 символов"
-            )
+            "Текст не должен быть длиннее 300 символов"
+        )
         return JOB
     elif len(update.message.text) == 0:
         update.message.reply_text(
@@ -196,7 +197,7 @@ def select_job(update: Update, context: CallbackContext) -> str:
         )
         return SKIP_HOBBY
     db.users.update_one({"user_id": user_id}, {"$set": {"job": job}})
-    markup=InlineKeyboardMarkup(
+    markup = InlineKeyboardMarkup(
         [
             [
                 InlineKeyboardButton(
@@ -206,12 +207,13 @@ def select_job(update: Update, context: CallbackContext) -> str:
     )
     return PHOTO
 
+
 def select_photo(update: Update, context: CallbackContext) -> str:
-    user_id=update.message.from_user.id
-    photo=update.message.photo[-1]
-    file_id=photo.file_id
+    user_id = update.message.from_user.id
+    photo = update.message.photo[-1]
+    file_id = photo.file_id
     db.users.update_one({"user_id": user_id}, {"$set": {"photo": file_id}})
-    markup=InlineKeyboardMarkup(
+    markup = InlineKeyboardMarkup(
         [
             [
                 InlineKeyboardButton(
@@ -221,8 +223,9 @@ def select_photo(update: Update, context: CallbackContext) -> str:
     )
     return ConversationHandler.END
 
+
 def skip_photo(update: Update, context: CallbackContext) -> str:
-    user_id=update.message.from_user.id
+    user_id = update.message.from_user.id
     db.users.update_one({"user_id": user_id}, {
                         "$set": {"photo": update.message.from_user.profile_photo_file_id}})
     update.message.reply_text(
@@ -231,10 +234,11 @@ def skip_photo(update: Update, context: CallbackContext) -> str:
     )
     return JOB
 
+
 def skip_job(update: Update, context: CallbackContext) -> str:
-    user_id=update.message.from_user.id
+    user_id = update.message.from_user.id
     db.users.update_one({"user_id": user_id}, {"$set": {"job": ""}})
-    markup=InlineKeyboardMarkup(
+    markup = InlineKeyboardMarkup(
         [
             [
                 InlineKeyboardButton(
@@ -245,12 +249,15 @@ def skip_job(update: Update, context: CallbackContext) -> str:
     )
     return ConversationHandler.END
 
+
 def delete_user(update: Update, context: CallbackContext) -> str:
-    user_id=update.message.from_user.id
+    user_id = update.message.from_user.id
     db.users.delete_one({"user_id": user_id})
     update.message.reply_text("Пока.")
 
 # cancel handler
+
+
 def cancel(update: Update, context: CallbackContext) -> str:
     update.message.reply_text("До скорых встреч")
     return ConversationHandler.END
@@ -258,15 +265,18 @@ def cancel(update: Update, context: CallbackContext) -> str:
 
 def registerHandlers():
     print("Registering handlers...")
-    dp=updater.dispatcher
+    dp = updater.dispatcher
 
-    job_search_handler=ConversationHandler(
+    job_search_handler = ConversationHandler(
         entry_points=[MessageHandler(Filters.text, select_job)],
         states={
+            JOB: [MessageHandler(Filters.text, select_job)],
+            PHOTO: [MessageHandler(Filters.photo, select_photo)]
         }
+
     )
 
-    register_handler=ConversationHandler(
+    register_handler = ConversationHandler(
         entry_points=[MessageHandler(Filters.text, ask_city)],
         states={
             CITY_SELECT: [MessageHandler(Filters.text, select_city)],
@@ -279,7 +289,7 @@ def registerHandlers():
         }
     )
 
-    search_rent_handler=ConversationHandler(
+    search_rent_handler = ConversationHandler(
         entry_points=[MessageHandler(Filters.text, ask_city)],
         states={
             ROOM: [MessageHandler(Filters.text, select_room)],
@@ -287,7 +297,7 @@ def registerHandlers():
         }
     )
 
-    search_job_handler=ConversationHandler(
+    search_job_handler = ConversationHandler(
         entry_points=[MessageHandler(Filters.text, ask_city)],
         states={
             EMPLOYEE: [MessageHandler(Filters.text, select_job)],
@@ -295,7 +305,7 @@ def registerHandlers():
         }
     )
 
-    search_handler=ConversationHandler(
+    search_handler = ConversationHandler(
         entry_points=[CommandHandler("search", start_search)],
         # search for flats, jobs or people
         states={
@@ -306,7 +316,7 @@ def registerHandlers():
         }
     )
 
-    conv_handler=ConversationHandler(
+    conv_handler = ConversationHandler(
         entry_points=[CommandHandler("start", start)],
         states={
             UNREGISTERED: register_handler,
