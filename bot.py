@@ -324,7 +324,7 @@ def registerHandlers():
     dp = updater.dispatcher
     search_people_handler = ConversationHandler(
         entry_points=[CallbackQueryHandler(
-            ask_people, pattern=getCallbackRegex(SEARCH_PEOPLE))],
+            ask_people)],
         states={
             AUTO: [MessageHandler(Filters.text, select_room)],
             TAGS: [MessageHandler(Filters.text, select_roommate)],
@@ -334,7 +334,7 @@ def registerHandlers():
 
     search_rent_handler = ConversationHandler(
         entry_points=[CallbackQueryHandler(
-            ask_rent_type, pattern=getCallbackRegex(SEARCH_RENT))],
+            ask_rent_type)],
         states={
             ROOM: [MessageHandler(Filters.text, select_room)],
             ROOMMATE: [MessageHandler(Filters.text, select_roommate)],
@@ -344,7 +344,7 @@ def registerHandlers():
 
     search_job_handler = ConversationHandler(
         entry_points=[CallbackQueryHandler(
-            ask_job, pattern=getCallbackRegex(SEARCH_JOB))],
+            ask_job)],
         states={
             EMPLOYEE: [MessageHandler(Filters.text, select_employee)],
             EMPLOYER: [MessageHandler(Filters.text, select_employer)],
@@ -354,7 +354,7 @@ def registerHandlers():
 
     register_handler = ConversationHandler(
         entry_points=[CallbackQueryHandler(
-            start_register, pattern=getCallbackRegex(REGISTER))],
+            start_register)],
         states={
             HOBBY: [MessageHandler(Filters.text, select_hobby)],
             SKIP_HOBBY: [MessageHandler(Filters.text, skip_hobby)],
@@ -368,7 +368,7 @@ def registerHandlers():
 
     search_handler = ConversationHandler(
         entry_points=[
-            CallbackQueryHandler(start_search, pattern=getCallbackRegex(SEARCH))],
+            CallbackQueryHandler(start_search)],
         # search for flats, jobs or people
         states={
             SEARCH_RENT: [search_rent_handler],
