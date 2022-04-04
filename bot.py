@@ -363,6 +363,9 @@ def registerHandlers():
             PHOTO: [MessageHandler(Filters.photo, select_photo)],
             SKIP_PHOTO: [MessageHandler(Filters.text, skip_photo)]
         },
+        map_to_parent={
+            HOBBY: HOBBY
+        },
         fallbacks=[CommandHandler('cancel', cancel)]
     )
 
