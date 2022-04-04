@@ -62,6 +62,7 @@ def error_handler(update: object, context: CallbackContext) -> None:
 
 def ask_purpose(update: Update, context: CallbackContext) -> str:
     query = update.callback_query
+    update.callback_query.answer()
     user_id = query.from_user.id
     if db.users.find_one({"user_id": user_id}):
         return REGISTER
@@ -122,6 +123,7 @@ def select_city(update: Update, context: CallbackContext) -> str:
     if update.message.text:
         city = update.message.text
     else:
+        update.callback_query.answer()
         city = update.callback_query.data
 
     print(city)
@@ -172,7 +174,6 @@ def select_city(update: Update, context: CallbackContext) -> str:
 
 
 def select_hobby(update: Update, context: CallbackContext) -> str:
-    print(update.callback_query.data)
     user_id = update.message.from_user.id
     hobby = update.message.text
     # if message is longer than 300 symbols
