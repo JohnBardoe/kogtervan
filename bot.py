@@ -370,6 +370,7 @@ def registerHandlers():
         map_to_parent={
             HOBBY: HOBBY
         },
+        per_message=True,
         fallbacks=[CommandHandler('cancel', cancel)]
     )
 
