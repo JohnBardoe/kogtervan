@@ -21,6 +21,7 @@ import html
 import json
 import difflib
 
+
 ########STRUCTURE########
 REGISTER, SEARCH, ASK_PURPOSE, CITY_SELECT = range(4)
 SEARCH_JOB, SEARCH_RENT, SEARCH_PEOPLE, DELETE = range(4)
@@ -168,6 +169,7 @@ def select_city(update: Update, context: CallbackContext) -> str:
 
 
 def select_hobby(update: Update, context: CallbackContext) -> str:
+    print(update.callback_query.data)
     user_id = update.message.from_user.id
     hobby = update.message.text
     # if message is longer than 300 symbols
@@ -396,7 +398,7 @@ def registerHandlers():
         allow_reentry=True,
         fallbacks=[CommandHandler("cancel", cancel)]
     )
-    
+
     # register handler
     dp.add_handler(conv_handler)
     dp.add_error_handler(error_handler)
