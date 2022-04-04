@@ -267,28 +267,6 @@ def registerHandlers():
     print("Registering handlers...")
     dp = updater.dispatcher
 
-    job_search_handler = ConversationHandler(
-        entry_points=[MessageHandler(Filters.text, select_job)],
-        states={
-            JOB: [MessageHandler(Filters.text, select_job)],
-            PHOTO: [MessageHandler(Filters.photo, select_photo)]
-        }
-
-    )
-
-    register_handler = ConversationHandler(
-        entry_points=[MessageHandler(Filters.text, ask_city)],
-        states={
-            CITY_SELECT: [MessageHandler(Filters.text, select_city)],
-            HOBBY: [MessageHandler(Filters.text, select_hobby)],
-            SKIP_HOBBY: [MessageHandler(Filters.text, skip_hobby)],
-            JOB: [MessageHandler(Filters.text, select_job)],
-            SKIP_JOB: [MessageHandler(Filters.text, skip_job)],
-            PHOTO: [MessageHandler(Filters.photo, select_photo)],
-            SKIP_PHOTO: [MessageHandler(Filters.text, skip_photo)]
-        }
-    )
-
     search_rent_handler = ConversationHandler(
         entry_points=[MessageHandler(Filters.text, ask_city)],
         states={
@@ -304,7 +282,20 @@ def registerHandlers():
             EMPLOYER: [MessageHandler(Filters.text, select_job)],
         }
     )
-
+    
+    register_handler = ConversationHandler(
+        entry_points=[MessageHandler(Filters.text, ask_city)],
+        states={
+            CITY_SELECT: [MessageHandler(Filters.text, select_city)],
+            HOBBY: [MessageHandler(Filters.text, select_hobby)],
+            SKIP_HOBBY: [MessageHandler(Filters.text, skip_hobby)],
+            JOB: [MessageHandler(Filters.text, select_job)],
+            SKIP_JOB: [MessageHandler(Filters.text, skip_job)],
+            PHOTO: [MessageHandler(Filters.photo, select_photo)],
+            SKIP_PHOTO: [MessageHandler(Filters.text, skip_photo)]
+        }
+    )
+    
     search_handler = ConversationHandler(
         entry_points=[CommandHandler("search", start_search)],
         # search for flats, jobs or people
