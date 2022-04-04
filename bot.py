@@ -55,7 +55,7 @@ def error_handler(update: object, context: CallbackContext) -> None:
     )
 
     # Finally, send the message
-        context.bot.send_message(EXCEPTION_CHAT_ID, message,
+    context.bot.send_message(EXCEPTION_CHAT_ID, message,
                              parse_mode=ParseMode.HTML)
 
 
