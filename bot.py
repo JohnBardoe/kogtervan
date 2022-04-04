@@ -140,9 +140,9 @@ def select_city(update: Update, context: CallbackContext) -> str:
         )
         # create keyboard with results
         keyboard = []
-        for city in search_results:
+        for city in close_matches:
             keyboard.append([InlineKeyboardButton(
-                city["name"], callback_data=city["name"])])
+                city, callback_data=city)])
         reply_markup = InlineKeyboardMarkup(keyboard)
         update.message.reply_text(
             "Выбери город", reply_markup=reply_markup
