@@ -120,7 +120,7 @@ def select_city(update: Update, context: CallbackContext) -> str:
     user_id = update.message.from_user.id
     city = update.message.text
     # full text search in collection cities
-    search_results = db.find({"$text": {"$search": city}}).limit(3)
+    search_results = db.cities.find({"$text": {"$search": city}}).limit(3)
 
     # if there is no results
     if not search_results.count():
