@@ -37,6 +37,7 @@ db = MongoClient("mongodb://localhost:27017/").kv  # name of db is kv
 
 list_of_cities = [i["name"] for i in db.cities.find()]
 
+
 def error_handler(update: object, context: CallbackContext) -> None:
     tb_list = traceback.format_exception(
         None, context.error, context.error.__traceback__
@@ -54,12 +55,13 @@ def error_handler(update: object, context: CallbackContext) -> None:
     )
 
     # Finally, send the message
-    context.bot.send_message(EXCEPTION_CHAT_ID, message,
+        context.bot.send_message(EXCEPTION_CHAT_ID, message,
                              parse_mode=ParseMode.HTML)
 
 
 def ask_purpose(update: Update, context: CallbackContext) -> str:
-    user_id = update.callback_query.from_user.id
+    query = update.callback_query
+    user_id = query.from_user.id
     if db.users.find_one({"user_id": user_id}):
         return REGISTER
 
@@ -71,7 +73,7 @@ def ask_purpose(update: Update, context: CallbackContext) -> str:
                 "Я бы нашел кого себе...", callback_data="SEARCH")],
         ]
     )
-    update.message.reply_text(
+    query.edit_message_text(
         f"А вообще ты тут зачем?",
         reply_markup=reply_markup,
     )
@@ -118,10 +120,10 @@ def select_city(update: Update, context: CallbackContext) -> str:
     user_id = update.message.from_user.id
     city = update.message.text
     # full text search in collection cities
-    
-    
-    #find close matches to input city
-    close_matches = difflib.get_close_matches(city, list_of_cities, n=3, cutoff=0.8)
+
+    # find close matches to input city
+    close_matches = difflib.get_close_matches(
+        city, list_of_cities, n=3, cutoff=0.8)
 
     # if there is no results
     if not len(close_matches):
