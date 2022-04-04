@@ -35,10 +35,7 @@ EXCEPTION_CHAT_ID = 328982832
 updater = Updater(os.environ.get("TELEGRAM_TOKEN"), use_context=True)
 db = MongoClient("mongodb://localhost:27017/").kv  # name of db is kv
 
-
-def getCallbackRegex(value):
-    return '^' + str(value) + '$'
-
+list_of_cities = [i["name"] for i in db.cities.find()]
 
 def error_handler(update: object, context: CallbackContext) -> None:
     tb_list = traceback.format_exception(
@@ -75,7 +72,7 @@ def ask_purpose(update: Update, context: CallbackContext) -> str:
         ]
     )
     update.message.reply_text(
-        f"Привет {update.effective_user.first_name}! Ты тут зачем?",
+        f"А вообще ты тут зачем?",
         reply_markup=reply_markup,
     )
 # start handler for searching
@@ -121,17 +118,20 @@ def select_city(update: Update, context: CallbackContext) -> str:
     user_id = update.message.from_user.id
     city = update.message.text
     # full text search in collection cities
-    search_results = db.cities.find({"$text": {"$search": city}}).limit(3)
+    
+    
+    #find close matches to input city
+    close_matches = difflib.get_close_matches(city, list_of_cities, n=3, cutoff=0.8)
 
     # if there is no results
-    if not search_results.count():
+    if not close_matches.count():
         update.message.reply_text(
             "Такого города нет в базе. Попробуй еще раз"
         )
         return CITY_SELECT
 
     # if there is more than one result
-    if search_results.count() > 1:
+    if close_matches.count() > 1:
         update.message.reply_text(
             "Найдено несколько городов. Выбери один из них"
         )
@@ -148,7 +148,7 @@ def select_city(update: Update, context: CallbackContext) -> str:
         return CITY_SELECT
 
     # if there is only one result
-    city = search_results[0]["name"]
+    city = close_matches[0]
     db.users.update_one({"user_id": user_id}, {
                         "$set": {"city_id": city}})
 
