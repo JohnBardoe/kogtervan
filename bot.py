@@ -22,7 +22,7 @@ import json
 import difflib
 
 ########STRUCTURE########
-REGISTERED, UNREGISTERED = range(2)
+REGISTERED, SEARCH_PEOPLE = range(2)
 SEARCH_JOB, SEARCH_RENT, SEARCH_PEOPLE, DELETE = range(4)
 CITY_SELECT, HOBBY, SKIP_HOBBY, JOB, SKIP_JOB, PHOTO, SKIP_PHOTO = range(7)
 EMPLOYEE, EMPLOYER = range(2)
@@ -64,9 +64,9 @@ def start(update: Update, context: CallbackContext) -> str:
     reply_markup = InlineKeyboardMarkup(
         [
             [InlineKeyboardButton("Зарегистрируй меня!",
-                                  callback_data="REGISTER")],
+                                  callback_data="UNREGISTERED")],
             [InlineKeyboardButton(
-                "Я бы нашел кого себе...", callback_data="FIND")],
+                "Я бы нашел кого себе...", callback_data="SEARCH_PEOPLE")],
         ]
     )
     update.message.reply_text(
@@ -362,7 +362,7 @@ def registerHandlers():
         entry_points=[CommandHandler("start", start)],
         states={
             UNREGISTERED: [register_handler],
-            REGISTERED: [search_handler]
+            SEARCH_PEOPLE: [search_handler]
         },
         fallbacks=[CommandHandler("cancel", cancel)]
     )
