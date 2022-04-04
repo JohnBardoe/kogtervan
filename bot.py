@@ -80,6 +80,16 @@ def ask_purpose(update: Update, context: CallbackContext) -> str:
 # start handler for searching
 
 
+def start_register(update: Update, context: CallbackContext) -> str:
+    # read query
+    query = update.callback_query
+    # send message in reply to callback query
+    query.message.reply_text(
+        "Накидай пару слов о себе. Хобби, характер и прочее."
+    )
+    return HOBBY
+
+
 def start_search(update: Update, context: CallbackContext) -> str:
     user_id = update.message.from_user.id
     text = "Кого искать будем?"
@@ -339,7 +349,7 @@ def registerHandlers():
 
     register_handler = ConversationHandler(
         entry_points=[CallbackQueryHandler(
-            ask_city, pattern=getCallbackRegex(REGISTER))],
+            start_register, pattern=getCallbackRegex(REGISTER))],
         states={
             HOBBY: [MessageHandler(Filters.text, select_hobby)],
             SKIP_HOBBY: [MessageHandler(Filters.text, skip_hobby)],
