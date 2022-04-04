@@ -264,12 +264,36 @@ def cancel(update: Update, context: CallbackContext) -> str:
     return ConversationHandler.END
 
 
+def ask_rent(update: Update, context: CallbackContext) -> str:
+    return ConversationHandler.END
+
+
+def ask_job(update: Update, context: CallbackContext) -> str:
+    return ConversationHandler.END
+
+
+def select_employee(update: Update, context: CallbackContext) -> str:
+    return ConversationHandler.END
+
+
+def select_employer(update: Update, context: CallbackContext) -> str:
+    return ConversationHandler.END
+
+
+def select_room(update: Update, context: CallbackContext) -> str:
+    return ConversationHandler.END
+
+
+def select_roommate(update: Update, context: CallbackContext) -> str:
+    return ConversationHandler.END
+
+
 def registerHandlers():
     print("Registering handlers...")
     dp = updater.dispatcher
 
     search_rent_handler = ConversationHandler(
-        entry_points=[MessageHandler(Filters.text, ask_city)],
+        entry_points=[MessageHandler(Filters.text, ask_rent)],
         states={
             ROOM: [MessageHandler(Filters.text, select_room)],
             ROOMMATE: [MessageHandler(Filters.text, select_roommate)],
@@ -277,13 +301,13 @@ def registerHandlers():
     )
 
     search_job_handler = ConversationHandler(
-        entry_points=[MessageHandler(Filters.text, ask_city)],
+        entry_points=[MessageHandler(Filters.text, ask_job)],
         states={
-            EMPLOYEE: [MessageHandler(Filters.text, select_job)],
-            EMPLOYER: [MessageHandler(Filters.text, select_job)],
+            EMPLOYEE: [MessageHandler(Filters.text, select_employee)],
+            EMPLOYER: [MessageHandler(Filters.text, select_employer)],
         }
     )
-    
+
     register_handler = ConversationHandler(
         entry_points=[MessageHandler(Filters.text, ask_city)],
         states={
@@ -296,7 +320,7 @@ def registerHandlers():
             SKIP_PHOTO: [MessageHandler(Filters.text, skip_photo)]
         }
     )
-    
+
     search_handler = ConversationHandler(
         entry_points=[CommandHandler("search", start_search)],
         # search for flats, jobs or people
