@@ -187,13 +187,15 @@ def select_hobby(update: Update, context: CallbackContext) -> str:
 
 
 def skip_hobby(update: Update, context: CallbackContext) -> str:
-    user_id = update.message.from_user.id
+    query = update.callback_query
+
+    user_id = query.from_user.id
     db.users.update_one({"user_id": user_id}, {"$set": {"hobby": ""}})
     markup = InlineKeyboardMarkup(
         [
             [
                 InlineKeyboardButton("Давай потом, а", callback_data="SKIP_JOB")]])
-    update.message.reply_text(
+    query.edit_message_text(
         "Двигаемся дальше\n\n"
         "Пару слов о работе накидай хотя бы. Разрешаю и про бизнес.", reply_markup=markup
     )
