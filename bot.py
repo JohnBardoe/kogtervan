@@ -350,9 +350,9 @@ def registerHandlers():
         entry_points=[CommandHandler("search", start_search)],
         # search for flats, jobs or people
         states={
-            SEARCH_RENT: search_rent_handler,
-            SEARCH_JOB: search_job_handler,
-            SEARCH_PEOPLE: search_people_handler,
+            SEARCH_RENT: [search_rent_handler],
+            SEARCH_JOB: [search_job_handler],
+            SEARCH_PEOPLE: [search_people_handler],
             DELETE: [MessageHandler(Filters.text, delete_user)]
         },
         fallbacks=[CommandHandler('cancel', cancel)]
@@ -361,8 +361,8 @@ def registerHandlers():
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler("start", start)],
         states={
-            UNREGISTERED: register_handler,
-            REGISTERED: search_handler
+            UNREGISTERED: [register_handler],
+            REGISTERED: [search_handler]
         },
         fallbacks=[CommandHandler("cancel", cancel)]
     )
