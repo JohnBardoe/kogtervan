@@ -120,7 +120,7 @@ def select_city(update: Update, context: CallbackContext) -> str:
     user_id = update.message.from_user.id
     city = update.message.text
     # full text search in collection cities
-    search_results = db.cities.find({"name": city})
+    search_results = db.find({"$text": {"$search": city}}).limit(3)
 
     # if there is no results
     if not search_results.count():
@@ -159,7 +159,7 @@ def select_city(update: Update, context: CallbackContext) -> str:
     update.message.reply_text(
         "Чувак, ты крут. А теперь в паре слов расскажи о том, что ты любишь делать.", reply_markup=markup
     )
-    return ASK_PURPOSE 
+    return ASK_PURPOSE
 
 
 def select_hobby(update: Update, context: CallbackContext) -> str:
