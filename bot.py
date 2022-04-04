@@ -174,15 +174,17 @@ def select_city(update: Update, context: CallbackContext) -> str:
 
 
 def select_hobby(update: Update, context: CallbackContext) -> str:
-    user_id = update.message.from_user.id
-    hobby = update.message.text
+    query = update.callback_query
+    user_id = update.effective_user.id
+    hobby = update.effective_message 
+    print(hobby)
     # if message is longer than 300 symbols
-    if len(update.message.text) > 300:
+    if len(hobby) > 300:
         update.message.reply_text(
             "Текст не должен быть длиннее 300 символов"
         )
         return HOBBY
-    elif len(update.message.text) == 0:
+    elif len(hobby) == 0:
         update.message.reply_text(
             "Ладно, храни свои секреты"
         )
@@ -362,7 +364,7 @@ def registerHandlers():
         entry_points=[CallbackQueryHandler(
             start_register)],
         states={
-            HOBBY: [MessageHandler(Filters.text, select_hobby)],
+            HOBBY: [CallbackQueryHandler(select_hobby)],
             SKIP_HOBBY: [MessageHandler(Filters.text, skip_hobby)],
             JOB: [MessageHandler(Filters.text, select_job)],
             SKIP_JOB: [MessageHandler(Filters.text, skip_job)],
