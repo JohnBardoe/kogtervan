@@ -297,7 +297,8 @@ def registerHandlers():
         states={
             ROOM: [MessageHandler(Filters.text, select_room)],
             ROOMMATE: [MessageHandler(Filters.text, select_roommate)],
-        }
+        },
+        fallbacks=[CommandHandler('cancel', cancel)]
     )
 
     search_job_handler = ConversationHandler(
@@ -305,7 +306,8 @@ def registerHandlers():
         states={
             EMPLOYEE: [MessageHandler(Filters.text, select_employee)],
             EMPLOYER: [MessageHandler(Filters.text, select_employer)],
-        }
+        },
+        fallbacks=[MessageHandler(Filters.text, cancel)]
     )
 
     register_handler = ConversationHandler(
@@ -318,7 +320,8 @@ def registerHandlers():
             SKIP_JOB: [MessageHandler(Filters.text, skip_job)],
             PHOTO: [MessageHandler(Filters.photo, select_photo)],
             SKIP_PHOTO: [MessageHandler(Filters.text, skip_photo)]
-        }
+        },
+        fallbacks=[CommandHandler('cancel', cancel)]
     )
 
     search_handler = ConversationHandler(
@@ -329,7 +332,8 @@ def registerHandlers():
             SEARCH_JOB: search_job_handler,
             SEARCH_PEOPLE: search_people_handler,
             DELETE: [MessageHandler(Filters.text, delete_user)]
-        }
+        },
+        fallbacks=[CommandHandler('cancel', cancel)]
     )
 
     conv_handler = ConversationHandler(
