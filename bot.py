@@ -159,7 +159,7 @@ def select_city(update: Update, context: CallbackContext) -> str:
     update.message.reply_text(
         "Чувак, ты крут. А теперь в паре слов расскажи о том, что ты любишь делать.", reply_markup=markup
     )
-    return HOBBY
+    return ASK_PURPOSE 
 
 
 def select_hobby(update: Update, context: CallbackContext) -> str:
