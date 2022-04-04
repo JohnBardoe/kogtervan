@@ -351,7 +351,7 @@ def registerHandlers():
 
     search_handler = ConversationHandler(
         entry_points=[
-            CallbackQueryHandler(show_data, pattern=getCallbackRegex(SEARCH))],
+            CallbackQueryHandler(start_search, pattern=getCallbackRegex(SEARCH))],
         # search for flats, jobs or people
         states = {
             SEARCH_RENT: [search_rent_handler],
