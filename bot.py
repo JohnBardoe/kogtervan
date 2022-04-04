@@ -33,7 +33,7 @@ AUTO, TAGS = range(2)
 
 EXCEPTION_CHAT_ID = 328982832
 updater = Updater(os.environ.get("TELEGRAM_TOKEN"), use_context=True)
-db = MongoClient("mongodb://localhost:1066/").kv  # name of db is kv
+db = MongoClient("mongodb://localhost:27017/").kv  # name of db is kv
 
 
 def error_handler(update: object, context: CallbackContext) -> None:
