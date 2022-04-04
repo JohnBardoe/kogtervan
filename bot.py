@@ -22,7 +22,10 @@ import json
 import difflib
 
 ########STRUCTURE########
-PURPOSE, CITY = range(2)
+REGISTERED, UNREGISTERED = range(2)
+SEARCH_JOB, SEARCH_RENT, SEARCH_PEOPLE, DELETE = range(4)
+CITY_SELECT, HOBBY, SKIP_HOBBY, JOB, SKIP_JOB, PHOTO, SKIP_PHOTO = range(7)
+
 #########################
 
 EXCEPTION_CHAT_ID = 328982832
@@ -83,7 +86,8 @@ def start_search(update: Update, context: CallbackContext) -> str:
             [InlineKeyboardButton("Для хобби?", callback_data="NAME")],
             [InlineKeyboardButton("Для работы?", callback_data="CITY")],
             [InlineKeyboardButton("Для хаты?", callback_data="")],
-    update.message.reply_text(text)
+        ]
+    update.message.reply_text(text, reply_markup=reply_markup)
 
 def ask_city(update: Update, context: CallbackContext) -> str:
     # change text based on state
