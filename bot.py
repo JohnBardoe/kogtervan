@@ -22,7 +22,7 @@ import json
 import difflib
 
 ########STRUCTURE########
-REGISTERED, SEARCH_PEOPLE = range(2)
+REGISTER, UNREGISTERED = range(2)
 SEARCH_JOB, SEARCH_RENT, SEARCH_PEOPLE, DELETE = range(4)
 CITY_SELECT, HOBBY, SKIP_HOBBY, JOB, SKIP_JOB, PHOTO, SKIP_PHOTO = range(7)
 EMPLOYEE, EMPLOYER = range(2)
@@ -60,11 +60,11 @@ def error_handler(update: object, context: CallbackContext) -> None:
 def start(update: Update, context: CallbackContext) -> str:
     user_id = update.message.from_user.id
     if db.users.find_one({"user_id": user_id}):
-        return REGISTERED
+        return REGISTER
     reply_markup = InlineKeyboardMarkup(
         [
             [InlineKeyboardButton("Зарегистрируй меня!",
-                                  callback_data="UNREGISTERED")],
+                                  callback_data="REGISTER")],
             [InlineKeyboardButton(
                 "Я бы нашел кого себе...", callback_data="SEARCH_PEOPLE")],
         ]
