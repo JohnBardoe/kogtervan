@@ -87,21 +87,25 @@ def start_search(update: Update, context: CallbackContext) -> str:
             [InlineKeyboardButton("Для работы?", callback_data="CITY")],
             [InlineKeyboardButton("Для хаты?", callback_data="")],
         ]
+
+    )
     update.message.reply_text(text, reply_markup=reply_markup)
+
 
 def ask_city(update: Update, context: CallbackContext) -> str:
     # change text based on state
-    text="Напиши город, где ты сейчас находишься"
+    text = "Напиши город, где ты сейчас находишься"
     elif context.chat_data.get("state") == FIND:
-        text="Напиши город, где будешь искать друзей"
+        text = "Напиши город, где будешь искать друзей"
 
     return CITY_SELECT
 
+
 def select_city(update: Update, context: CallbackContext) -> str:
-    user_id=update.message.from_user.id
-    city=update.message.text
+    user_id = update.message.from_user.id
+    city = update.message.text
     # full text search in collection cities
-    search_results=db.cities.find({"name": city})
+    search_results = db.cities.find({"name": city})
 
     # if there is no results
     if not search_results.count():
@@ -116,11 +120,11 @@ def select_city(update: Update, context: CallbackContext) -> str:
             "Найдено несколько городов. Выбери один из них"
         )
         # create keyboard with results
-        keyboard=[]
+        keyboard = []
         for city in search_results:
             keyboard.append([InlineKeyboardButton(
                 city["name"], callback_data=city["name"])])
-        reply_markup=InlineKeyboardMarkup(keyboard)
+        reply_markup = InlineKeyboardMarkup(keyboard)
         update.message.reply_text(
             "Выбери город", reply_markup=reply_markup
         )
@@ -131,7 +135,7 @@ def select_city(update: Update, context: CallbackContext) -> str:
                         "$set": {"city_id": city["city_id"]}})
 
     # add an inline keyboard button to skip next step in reply
-    markup=InlineKeyboardMarkup(
+    markup = InlineKeyboardMarkup(
         [
             [
                 InlineKeyboardButton(
