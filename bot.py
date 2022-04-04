@@ -22,7 +22,7 @@ import json
 import difflib
 
 ########STRUCTURE########
-REGISTER, UNREGISTERED = range(2)
+REGISTER, SEARCH = range(2)
 SEARCH_JOB, SEARCH_RENT, SEARCH_PEOPLE, DELETE = range(4)
 CITY_SELECT, HOBBY, SKIP_HOBBY, JOB, SKIP_JOB, PHOTO, SKIP_PHOTO = range(7)
 EMPLOYEE, EMPLOYER = range(2)
@@ -34,6 +34,9 @@ AUTO, TAGS = range(2)
 EXCEPTION_CHAT_ID = 328982832
 updater = Updater(os.environ.get("TELEGRAM_TOKEN"), use_context=True)
 db = MongoClient("mongodb://localhost:27017/").kv  # name of db is kv
+
+def getCallbackRegex(value):
+    return '^' + str(value) + '$'
 
 
 def error_handler(update: object, context: CallbackContext) -> None:
@@ -98,7 +101,7 @@ def start_search(update: Update, context: CallbackContext) -> str:
 def ask_city(update: Update, context: CallbackContext) -> str:
     # change text based on state
     text = "Напиши город, где ты сейчас находишься"
-    if context.chat_data.get("state") == FIND:
+    if context.chat_data.get("state") == SEARCH:
         text = "Напиши город, где будешь искать друзей"
 
     return CITY_SELECT
@@ -306,7 +309,7 @@ def registerHandlers():
     print("Registering handlers...")
     dp = updater.dispatcher
     search_people_handler = ConversationHandler(
-        entry_points=[MessageHandler(Filters.text, ask_people)],
+        entry_points=[CallbackQueryHandler(ask_people, pattern=getCallbackRegex(SEARCH_PEOPLE))],
         states={
             AUTO: [MessageHandler(Filters.text, select_room)],
             TAGS: [MessageHandler(Filters.text, select_roommate)],
@@ -315,7 +318,7 @@ def registerHandlers():
     )
 
     search_rent_handler = ConversationHandler(
-        entry_points=[MessageHandler(Filters.text, ask_rent_type)],
+        entry_points=[CallbackQueryHandler(ask_rent_type, pattern=getCallbackRegex(SEARCH_RENT))],
         states={
             ROOM: [MessageHandler(Filters.text, select_room)],
             ROOMMATE: [MessageHandler(Filters.text, select_roommate)],
@@ -324,7 +327,7 @@ def registerHandlers():
     )
 
     search_job_handler = ConversationHandler(
-        entry_points=[MessageHandler(Filters.text, ask_job)],
+        entry_points=[CallbackQueryHandler(ask_job, pattern=getCallbackRegex(SEARCH_JOB))],
         states={
             EMPLOYEE: [MessageHandler(Filters.text, select_employee)],
             EMPLOYER: [MessageHandler(Filters.text, select_employer)],
@@ -333,7 +336,7 @@ def registerHandlers():
     )
 
     register_handler = ConversationHandler(
-        entry_points=[MessageHandler(Filters.text, ask_city)],
+        entry_points=[CallbackQueryHandler(ask_city, pattern=getCallbackRegex(REGISTER))],
         states={
             CITY_SELECT: [MessageHandler(Filters.text, select_city)],
             HOBBY: [MessageHandler(Filters.text, select_hobby)],
@@ -347,24 +350,28 @@ def registerHandlers():
     )
 
     search_handler = ConversationHandler(
-        entry_points=[CommandHandler("search", start_search)],
+        entry_points=[
+            CallbackQueryHandler(show_data, pattern=getCallbackRegex(SEARCH))],
         # search for flats, jobs or people
-        states={
+        states = {
             SEARCH_RENT: [search_rent_handler],
             SEARCH_JOB: [search_job_handler],
             SEARCH_PEOPLE: [search_people_handler],
             DELETE: [MessageHandler(Filters.text, delete_user)]
         },
-        fallbacks=[CommandHandler('cancel', cancel)]
+        fallbacks = [CommandHandler('cancel', cancel)],
+        map_to_parent = {
+                REGISTER: REGISTER,
+        }
     )
 
-    conv_handler = ConversationHandler(
-        entry_points=[CommandHandler("start", start)],
-        states={
+    conv_handler=ConversationHandler(
+        entry_points = [CommandHandler("start", start)],
+        states = {
             REGISTER: [register_handler],
-            SEARCH_PEOPLE: [search_handler]
+            SEARCH: [search_handler]
         },
-        fallbacks=[CommandHandler("cancel", cancel)]
+        fallbacks = [CommandHandler("cancel", cancel)]
     )
 
     # register handler
