@@ -311,7 +311,8 @@ def registerHandlers():
         states={
             UNREGISTERED: register_handler,
             REGISTERED: search_handler
-        }
+        },
+        fallbacks=[CommandHandler("cancel", cancel)]
     )
 
     # register handler
