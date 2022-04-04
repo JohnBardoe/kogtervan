@@ -361,7 +361,7 @@ def registerHandlers():
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler("start", start)],
         states={
-            UNREGISTERED: [register_handler],
+            REGISTER: [register_handler],
             SEARCH_PEOPLE: [search_handler]
         },
         fallbacks=[CommandHandler("cancel", cancel)]
