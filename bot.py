@@ -148,9 +148,9 @@ def select_city(update: Update, context: CallbackContext) -> str:
         return CITY_SELECT
 
     # if there is only one result
-
+    city = search_results[0]["name"]
     db.users.update_one({"user_id": user_id}, {
-                        "$set": {"city_id": search_results[0]["city_id"]}})
+                        "$set": {"city_id": city}})
 
     # add an inline keyboard button to skip next step in reply
     markup = InlineKeyboardMarkup(
@@ -160,7 +160,7 @@ def select_city(update: Update, context: CallbackContext) -> str:
                     "Давай потом, а", callback_data="SKIP_HOBBY")]])
 
     update.message.reply_text(
-        f"Чувак, буду заезжать в {search_results[0]['name']}, обязательно расскажешь где там движ. А теперь в паре слов расскажи о том, что ты любишь делать.", reply_markup=markup
+        f"Чувак, буду заезжать в {city}, обязательно расскажешь где там движ. А теперь в паре слов расскажи о том, что ты любишь делать.", reply_markup=markup
     )
     return ASK_PURPOSE
 
