@@ -62,9 +62,10 @@ def error_handler(update: object, context: CallbackContext) -> None:
 
 
 def ask_purpose(update: Update, context: CallbackContext) -> str:
-    user_id = update.message.from_user.id
+    user_id = update.callback_query.from_user.id
     if db.users.find_one({"user_id": user_id}):
         return REGISTER
+
     reply_markup = InlineKeyboardMarkup(
         [
             [InlineKeyboardButton("Зарегистрируй меня!",
@@ -145,9 +146,9 @@ def select_city(update: Update, context: CallbackContext) -> str:
         )
         # save selected city
         return CITY_SELECT
-    
+
     # if there is only one result
-    
+
     db.users.update_one({"user_id": user_id}, {
                         "$set": {"city_id": search_results[0]["city_id"]}})
 
@@ -159,7 +160,7 @@ def select_city(update: Update, context: CallbackContext) -> str:
                     "Давай потом, а", callback_data="SKIP_HOBBY")]])
 
     update.message.reply_text(
-        "Чувак, ты крут. А теперь в паре слов расскажи о том, что ты любишь делать.", reply_markup=markup
+        f"Чувак, буду заезжать в {search_results[0]["city_id"]}, обязательно расскажешь где там движ. А теперь в паре слов расскажи о том, что ты любишь делать.", reply_markup=markup
     )
     return ASK_PURPOSE
 
