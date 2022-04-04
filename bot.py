@@ -95,7 +95,7 @@ def start_search(update: Update, context: CallbackContext) -> str:
 def ask_city(update: Update, context: CallbackContext) -> str:
     # change text based on state
     text = "Напиши город, где ты сейчас находишься"
-    elif context.chat_data.get("state") == FIND:
+    if context.chat_data.get("state") == FIND:
         text = "Напиши город, где будешь искать друзей"
 
     return CITY_SELECT
@@ -139,15 +139,17 @@ def select_city(update: Update, context: CallbackContext) -> str:
         [
             [
                 InlineKeyboardButton(
-                    "Давай потом, а", callback_data="SKIP_HOBBY"),
+                    "Давай потом, а", callback_data="SKIP_HOBBY")]])
+
     update.message.reply_text(
         "Чувак, ты крут. А теперь в паре слов расскажи о том, что ты любишь делать.", reply_markup=markup
     )
     return HOBBY
 
+
 def select_hobby(update: Update, context: CallbackContext) -> str:
-    user_id=update.message.from_user.id
-    hobby=update.message.text
+    user_id = update.message.from_user.id
+    hobby = update.message.text
     # if message is longer than 300 symbols
     if len(update.message.text) > 300:
         update.message.reply_text(
@@ -165,13 +167,14 @@ def select_hobby(update: Update, context: CallbackContext) -> str:
     )
     return JOB
 
+
 def skip_hobby(update: Update, context: CallbackContext) -> str:
-    user_id=update.message.from_user.id
+    user_id = update.message.from_user.id
     db.users.update_one({"user_id": user_id}, {"$set": {"hobby": ""}})
-    markup=InlineKeyboardMarkup(
+    markup = InlineKeyboardMarkup(
         [
             [
-                InlineKeyboardButton("Давай потом, а", callback_data="SKIP_JOB")],
+                InlineKeyboardButton("Давай потом, а", callback_data="SKIP_JOB")]])
     update.message.reply_text(
         "Двигаемся дальше\n\n"
         "Пару слов о работе накидай хотя бы. Разрешаю и про бизнес.", reply_markup=markup
@@ -197,7 +200,7 @@ def select_job(update: Update, context: CallbackContext) -> str:
         [
             [
                 InlineKeyboardButton(
-                    "Давай потом, а", callback_data="SKIP_JOB"),
+                    "Давай потом, а", callback_data="SKIP_JOB")]])
     update.message.reply_text(
         "Накинь еще фоточку для полного фарша", reply_markup=markup
     )
@@ -212,7 +215,7 @@ def select_photo(update: Update, context: CallbackContext) -> str:
         [
             [
                 InlineKeyboardButton(
-                    "Бери с авы и не парься", callback_data="SKIP_PHOTO"),
+                    "Бери с авы и не парься", callback_data="SKIP_PHOTO")]])
     update.message.reply_text(
         "Накинь еще фоточку для полного фарша", reply_markup=markup
     )
@@ -235,7 +238,7 @@ def skip_job(update: Update, context: CallbackContext) -> str:
         [
             [
                 InlineKeyboardButton(
-                    "Давай потом, а", callback_data="SKIP_PHOTO"),
+                    "Давай потом, а", callback_data="SKIP_PHOTO")]])
 
     update.message.reply_text(
         "Не очень-то и хотелось. Давай фотку хотяб.", reply_markup=markup
@@ -258,14 +261,14 @@ def registerHandlers():
     dp=updater.dispatcher
 
     job_search_handler=ConversationHandler(
-        entry_points=[MessageHandler(Filters.text, select_job)]
+        entry_points=[MessageHandler(Filters.text, select_job)],
         states={
         }
     )
 
     register_handler=ConversationHandler(
         entry_points=[MessageHandler(Filters.text, ask_city)],
-        states={,
+        states={
             CITY_SELECT: [MessageHandler(Filters.text, select_city)],
             HOBBY: [MessageHandler(Filters.text, select_hobby)],
             SKIP_HOBBY: [MessageHandler(Filters.text, skip_hobby)],
