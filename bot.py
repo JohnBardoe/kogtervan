@@ -119,7 +119,11 @@ def start(update: Update, context: CallbackContext) -> str:
 
 def select_city(update: Update, context: CallbackContext) -> str:
     user_id = update.message.from_user.id
-    city = update.message.text
+    
+    if update.message.text:
+        city = update.message.text
+    else:
+        city = update.callback_query.data
     # full text search in collection cities
 
     # find close matches to input city
@@ -147,9 +151,7 @@ def select_city(update: Update, context: CallbackContext) -> str:
         update.message.reply_text(
             "Выбери город", reply_markup=reply_markup
         )
-        # save selected city
         return CITY_SELECT
-
     # if there is only one result
     city = close_matches[0]
     db.users.update_one({"user_id": user_id}, {
