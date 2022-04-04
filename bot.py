@@ -145,9 +145,11 @@ def select_city(update: Update, context: CallbackContext) -> str:
         )
         # save selected city
         return CITY_SELECT
-
+    
+    # if there is only one result
+    
     db.users.update_one({"user_id": user_id}, {
-                        "$set": {"city_id": city["city_id"]}})
+                        "$set": {"city_id": search_results[0]["city_id"]}})
 
     # add an inline keyboard button to skip next step in reply
     markup = InlineKeyboardMarkup(
