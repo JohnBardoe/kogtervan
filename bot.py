@@ -141,15 +141,7 @@ def select_city(update: Update, context: CallbackContext) -> str:
 
     # save city to local context
     context.user_data["city_name"] = city
-    return ASK_PURPOSE
 
-
-def select_purpose(update: Update, context: CallbackContext) -> str:
-    query = update.callback_query
-    print("Selecting purpose, ", query)
-    purpose = query.data
-    user_id = query.from_user.id
-    city = context.user_data["city_name"]
     reply_markup = InlineKeyboardMarkup(
         [
             [InlineKeyboardButton("Обновить анкету" if db.users.find_one({"user_id": user_id}) else "Создай-ка мне анкету!",
@@ -162,12 +154,21 @@ def select_purpose(update: Update, context: CallbackContext) -> str:
         f"Ну и зачем тебе {city}?",
         reply_markup=reply_markup,
     )
+
+    return ASK_PURPOSE
+
+
+def select_purpose(update: Update, context: CallbackContext) -> str:
+    query = update.callback_query
     query.answer()
+    purpose = query.data
+    
+    return REGISTER if purpose == "REGISTER" else SEARCH
 
 
 def select_hobby(update: Update, context: CallbackContext) -> str:
 
-    #get user id and hobby
+    # get user id and hobby
     user_id = update.message.from_user.id
     hobby = update.message.text
 
@@ -176,7 +177,7 @@ def select_hobby(update: Update, context: CallbackContext) -> str:
         update.message.reply_text(
             "Текст не должен быть длиннее 300 символов"
         )
-        return REGISTER 
+        return REGISTER
     elif len(hobby) == 0:
         update.message.reply_text(
             "Ладно, храни свои секреты"
@@ -364,7 +365,7 @@ def registerHandlers():
         },
         fallbacks=[CommandHandler('cancel', cancel)],
         map_to_parent={
-            REGISTER: REGISTER 
+            REGISTER: REGISTER
         }
     )
 
