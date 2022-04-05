@@ -142,9 +142,6 @@ def select_city(update: Update, context: CallbackContext) -> str:
 
     # if there is more than one result
     elif len(close_matches) > 1:
-        update.message.reply_text(
-            "Найдено несколько городов. Выбери один из них"
-        )
         # create keyboard with results
         keyboard = []
         for city in close_matches:
@@ -152,7 +149,7 @@ def select_city(update: Update, context: CallbackContext) -> str:
                 city, callback_data=city)])
         reply_markup = InlineKeyboardMarkup(keyboard)
         update.message.reply_text(
-            "Выбери город", reply_markup=reply_markup
+            "Найдено несколько городов. Выбери один из них", reply_markup=reply_markup
         )
         return CITY_SELECT
     # if there is only one result
@@ -175,10 +172,10 @@ def select_city(update: Update, context: CallbackContext) -> str:
 
 def select_hobby(update: Update, context: CallbackContext) -> str:
     
+    print(update.de_json())
     query = update.callback_query
     user_id = update.effective_user.id
     hobby = update.callback_query.data 
-    print(hobby)
     # if message is longer than 300 symbols
     if len(hobby) > 300:
         update.message.reply_text(
