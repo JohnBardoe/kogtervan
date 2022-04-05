@@ -114,7 +114,6 @@ def select_city(update: Update, context: CallbackContext) -> str:
     # find close matches to input city
     close_matches = difflib.get_close_matches(
         city, list_of_cities, n=3, cutoff=0.8)
-
     # if there is no results
     if not len(close_matches):
         update.message.reply_text(
@@ -147,12 +146,13 @@ def select_city(update: Update, context: CallbackContext) -> str:
 
 def select_purpose(update: Update, context: CallbackContext) -> str:
     query = update.callback_query
+    print("Selecting purpose, ", query)
     purpose = query.data
     user_id = query.from_user.id
     city = context.user_data["city_name"]
     reply_markup = InlineKeyboardMarkup(
         [
-            [InlineKeyboardButton("Обновить анкету" if db.users.find_one({"user_id": user_id}) else "Зарегистрируй меня!",
+            [InlineKeyboardButton("Обновить анкету" if db.users.find_one({"user_id": user_id}) else "Создай-ка мне анкету!",
                                   callback_data="REGISTER")],
             [InlineKeyboardButton(
                 "Я бы нашел кого себе...", callback_data="SEARCH")],
