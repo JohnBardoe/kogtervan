@@ -60,28 +60,48 @@ def error_handler(update: object, context: CallbackContext) -> None:
                              parse_mode=ParseMode.HTML)
 
 
-def ask_purpose(update: Update, context: CallbackContext) -> str:
-    query = update.callback_query
-    update.callback_query.answer()
-
-    if query.data == "REGISTER":
-        update.callback_query.message.reply_text(
-            "Накидай пару слов о себе. Хобби, характер и прочее."
-        )
-        return REGISTER
-    else:
-        update.callback_query.message.reply_text("Кого искать будем?")
-        return SEARCH
-
-
-# start handler for searching
-
-
 def start_search(update: Update, context: CallbackContext) -> str:
-    # get query, user_id
+    # get query, query data and user_id
     query = update.callback_query
-    user_id = update.message.from_user.id
-    query.answer()
+    user_id = query.from_user.id
+    query_data = query.data
+
+    # if user is looking for job
+    if query_data == "JOB":
+        # get user data
+        user_data = db.users.find_one({"user_id": user_id})
+        # if user has hobby
+        if "hobby" in user_data:
+            # get user hobby
+            hobby = user_data["hobby"]
+            # get all jobs
+            jobs = db.jobs.find()
+            # get all jobs with similar hobby
+            similar_jobs = [job for job in jobs if difflib.SequenceMatcher(
+                None, job["hobby"], hobby).ratio() > 0.5]
+            # if there are no similar jobs
+            if len(similar_jobs) == 0:
+                query.edit_message_text("Нет таких вакансий")
+                return SEARCH_JOB
+            # if there are similar jobs
+            else:
+                # get all jobs names
+                job_names = [job["name"] for job in similar_jobs]
+
+        elif query_data == "PERSON":
+            # create 2 inline buttons
+            extra_tags_registered_button = InlineKeyboardMarkup(
+                [
+                    InlineKeyboardButton("Ищи как знаешь", callback_data="PERSON"),
+                ]
+            )
+            #show markup only if user is registered
+
+            query.edit_message_text("Напиши пару слов о себе", reply_markup=extra_tags_registered_button if db.uesrs.find_one({"user_id" : user_id} else None))
+            return SEARCH_PEOPLE
+        else:
+            query.edit_message_text("Нет таких вакансий")
+            return SEARCH_JOB
 
 
 def start(update: Update, context: CallbackContext) -> str:
@@ -163,7 +183,7 @@ def select_purpose(update: Update, context: CallbackContext) -> str:
     else:
         reply_markup = InlineKeyboardMarkup(
             [
-                [InlineKeyboardButton("Для хобби.", callback_data="NAME")],
+                [InlineKeyboardButton("Для хобби.", callback_data="PERSON")],
                 [InlineKeyboardButton("Для работы.", callback_data="CITY")],
                 [InlineKeyboardButton("Для хаты.", callback_data="RENT")],
             ]
