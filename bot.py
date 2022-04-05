@@ -76,22 +76,12 @@ def ask_purpose(update: Update, context: CallbackContext) -> str:
 
 
 def start_search(update: Update, context: CallbackContext) -> str:
+    #get query, user_id
+    query = update.callback_query
     user_id = update.message.from_user.id
-    text = "Кого искать будем?"
+    query.answer()
 
-    if not db.users.find_one({"user_id": user_id}):
-        text += "\n\n Но потом зарегайся как-нибудь. Мы людей выше в поиск ставим, которые под твое описание подходит."
 
-    # create 4 buttons for choosing what to search
-    reply_markup = InlineKeyboardMarkup(
-        [
-            [InlineKeyboardButton("Для хобби?", callback_data="NAME")],
-            [InlineKeyboardButton("Для работы?", callback_data="CITY")],
-            [InlineKeyboardButton("Для хаты?", callback_data="")],
-        ]
-
-    )
-    update.message.reply_text(text, reply_markup=reply_markup)
 
 
 def start(update: Update, context: CallbackContext) -> str:
@@ -162,9 +152,22 @@ def select_purpose(update: Update, context: CallbackContext) -> str:
     query = update.callback_query
     query.answer()
     purpose = query.data
-    
-    return REGISTER if purpose == "REGISTER" else SEARCH
+    if purpose == "REGISTER":
+        update.callback_query.message.reply_text(
+            "Накидай пару слов о себе. Хобби, характер и прочее.")
+        return REGISTER
+    else:
+        reply_markup = InlineKeyboardMarkup(
+         [
+             [InlineKeyboardButton("Для хобби.", callback_data="NAME")],
+             [InlineKeyboardButton("Для работы.", callback_data="CITY")],
+             [InlineKeyboardButton("Для хаты.", callback_data="RENT")],
+         ]
 
+     )
+     query.reply_text("Для чего ищем?", reply_markup=reply_markup)
+     update.callback_query.message.reply_text()
+     return SEARCH
 
 def select_hobby(update: Update, context: CallbackContext) -> str:
 
