@@ -63,33 +63,16 @@ def error_handler(update: object, context: CallbackContext) -> None:
 def ask_purpose(update: Update, context: CallbackContext) -> str:
     query = update.callback_query
     update.callback_query.answer()
-    user_id = query.from_user.id
-    if db.users.find_one({"user_id": user_id}):
-        return REGISTER
 
-    reply_markup = InlineKeyboardMarkup(
-        [
-            [InlineKeyboardButton("Зарегистрируй меня!",
-                                  callback_data="REGISTER")],
-            [InlineKeyboardButton(
-                "Я бы нашел кого себе...", callback_data="SEARCH")],
-        ]
-    )
-    query.edit_message_text(
-        f"А вообще ты тут зачем?",
-        reply_markup=reply_markup,
-    )
+    if query.data == "REGISTER":
+        update.callback_query.message.reply_text(
+            "Накидай пару слов о себе. Хобби, характер и прочее.")
+        return
+    else
+    update.callback_query.message.reply_text("Кого искать будем?")
+
+
 # start handler for searching
-
-
-def start_register(update: Update, context: CallbackContext) -> str:
-    # read query
-    query = update.callback_query
-    # send message in reply to callback query
-    query.message.reply_text(
-        "Накидай пару слов о себе. Хобби, характер и прочее."
-    )
-    return HOBBY
 
 
 def start_search(update: Update, context: CallbackContext) -> str:
@@ -140,7 +123,7 @@ def select_city(update: Update, context: CallbackContext) -> str:
         return CITY_SELECT
 
     # if there is more than one result
-    elif len(close_matches) > 1:
+    elif len(close_matches) > 1 or query:
         # create keyboard with results
         keyboard = []
         for city in close_matches:
@@ -150,27 +133,35 @@ def select_city(update: Update, context: CallbackContext) -> str:
         update.message.reply_text(
             "Найдено несколько городов. Выбери один из них", reply_markup=reply_markup
         )
-        user_data = context.user_data
-        # set new context user_input
-        user_data['user_input'] = city
-        context.user_data['user_input'] = user_data['user_input']
         return CITY_SELECT
     # if there is only one result
     city = close_matches[0]
     db.users.update_one({"user_id": user_id}, {
-                        "$set": {"city_id": city}})
+                        "$set": {"city_name": city}})
 
-    # add an inline keyboard button to skip next step in reply
-    markup = InlineKeyboardMarkup(
-        [
-            [
-                InlineKeyboardButton(
-                    "Давай потом, а", callback_data="SKIP_HOBBY")]])
-
-    update.message.reply_text(
-        f"Чувак, буду заезжать в {city}, обязательно расскажешь где там движ. А теперь в паре слов расскажи о том, что ты любишь делать.", reply_markup=markup
-    )
+    # save city to local context
+    context.user_data["city_name"] = city
     return ASK_PURPOSE
+
+
+def select_purpose(update: Update, context: CallbackContext) -> str:
+    query = update.callback_query
+    query.answer()
+    purpose = query.data
+    user_id = query.from_user.id
+    city = context.user_data["city_name"]
+    reply_markup = InlineKeyboardMarkup(
+        [
+            [InlineKeyboardButton((db.users.find_one({"user_id": user_id})) ? "Обновить анкету": "Зарегистрируй меня!",
+                                  callback_data="REGISTER")],
+            [InlineKeyboardButton(
+                "Я бы нашел кого себе...", callback_data="SEARCH")],
+        ]
+    )
+    query.edit_message_text(
+        f"Ну и зачем тебе {city}?",
+        reply_markup=reply_markup,
+    )
 
 
 def select_hobby(update: Update, context: CallbackContext) -> str:
@@ -361,20 +352,14 @@ def registerHandlers():
     )
 
     register_handler = ConversationHandler(
-        entry_points=[CallbackQueryHandler(
-            start_register)],
+        entry_points=[CallbackQueryHandler(select_hobby)],
         states={
-            HOBBY: [CallbackQueryHandler(select_hobby)],
             SKIP_HOBBY: [MessageHandler(Filters.text, skip_hobby)],
             JOB: [MessageHandler(Filters.text, select_job)],
             SKIP_JOB: [MessageHandler(Filters.text, skip_job)],
             PHOTO: [MessageHandler(Filters.photo, select_photo)],
             SKIP_PHOTO: [MessageHandler(Filters.text, skip_photo)]
         },
-        map_to_parent={
-            HOBBY: HOBBY
-        },
-        per_message=True,
         fallbacks=[CommandHandler('cancel', cancel)]
     )
 
@@ -389,9 +374,6 @@ def registerHandlers():
             DELETE: [MessageHandler(Filters.text, delete_user)]
         },
         fallbacks=[CommandHandler('cancel', cancel)],
-        map_to_parent={
-            REGISTER: REGISTER,
-        }
     )
 
     conv_handler = ConversationHandler(
@@ -399,9 +381,9 @@ def registerHandlers():
         states={
             CITY_SELECT: [MessageHandler(Filters.text, select_city, pass_user_data=True),
                           CallbackQueryHandler(select_city, pass_user_data=True)],
-            ASK_PURPOSE: [CallbackQueryHandler(ask_purpose)],
+            ASK_PURPOSE: [CallbackQueryHandler(select_purpose)],
             REGISTER: [register_handler],
-            SEARCH: [search_handler]
+            SEARCH: [search_handler],
         },
         per_user=True,
         allow_reentry=True,
