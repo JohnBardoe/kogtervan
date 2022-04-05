@@ -168,7 +168,7 @@ def select_purpose(update: Update, context: CallbackContext) -> str:
                 [InlineKeyboardButton("Для хаты.", callback_data="RENT")],
             ]
         )
-    query.reply_text("Для чего ищем?", reply_markup=reply_markup)
+    query.edit_message_text("Для чего ищем?", reply_markup=reply_markup)
     return SEARCH
 
 
