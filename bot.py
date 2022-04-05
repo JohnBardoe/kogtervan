@@ -119,15 +119,13 @@ def start(update: Update, context: CallbackContext) -> str:
 
 
 def select_city(update: Update, context: CallbackContext) -> str:
-    user_input = update.effective_message.text
+    city = update.effective_message.text
     # get user_data context
     user_data = context.user_data
     # set new context user_input
-    user_data['user_input'] = user_input
+    user_data['user_input'] = city
     context.user_data['user_input'] = user_data['user_input']
-
-    print(user_input)
-
+    
     user_id = update.effective_user.id
     # full text search in collection cities
 
