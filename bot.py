@@ -123,7 +123,7 @@ def select_city(update: Update, context: CallbackContext) -> str:
         return CITY_SELECT
 
     # if there is more than one result
-    elif len(close_matches) > 1 or not query:
+    elif len(close_matches) > 1 and not query:
         # create keyboard with results
         print(close_matches)
         keyboard = []
