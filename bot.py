@@ -123,9 +123,9 @@ def select_city(update: Update, context: CallbackContext) -> str:
         return CITY_SELECT
 
     # if there is more than one result
-    print(close_matches)
     elif len(close_matches) > 1 or not query:
         # create keyboard with results
+        print(close_matches)
         keyboard = []
         for city in close_matches:
             keyboard.append([InlineKeyboardButton(
