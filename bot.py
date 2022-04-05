@@ -174,9 +174,10 @@ def select_city(update: Update, context: CallbackContext) -> str:
 
 
 def select_hobby(update: Update, context: CallbackContext) -> str:
+    
     query = update.callback_query
     user_id = update.effective_user.id
-    hobby = update.effective_message 
+    hobby = update.callback_query.data 
     print(hobby)
     # if message is longer than 300 symbols
     if len(hobby) > 300:
