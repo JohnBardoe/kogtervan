@@ -380,8 +380,8 @@ def registerHandlers():
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler("start", start)],
         states={
-            CITY_SELECT: [MessageHandler(Filters.text, select_city, pass_user_data=True),
-                          CallbackQueryHandler(select_city, pass_user_data=True)],
+            CITY_SELECT: [MessageHandler(Filters.text, select_city),
+                          CallbackQueryHandler(select_city)],
             ASK_PURPOSE: [CallbackQueryHandler(select_purpose)],
             REGISTER: [register_handler],
             SEARCH: [search_handler],
