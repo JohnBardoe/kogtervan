@@ -76,12 +76,10 @@ def ask_purpose(update: Update, context: CallbackContext) -> str:
 
 
 def start_search(update: Update, context: CallbackContext) -> str:
-    #get query, user_id
+    # get query, user_id
     query = update.callback_query
     user_id = update.message.from_user.id
     query.answer()
-
-
 
 
 def start(update: Update, context: CallbackContext) -> str:
