@@ -56,7 +56,8 @@ def error_handler(update: object, context: CallbackContext) -> None:
     )
 
     # Finally, send the message
-    context.bot.send_message(EXCEPTION_CHAT_ID, message, parse_mode=ParseMode.HTML)
+    context.bot.send_message(EXCEPTION_CHAT_ID, message,
+                             parse_mode=ParseMode.HTML)
 
 
 def ask_purpose(update: Update, context: CallbackContext) -> str:
@@ -101,7 +102,8 @@ def select_city(update: Update, context: CallbackContext) -> str:
         user_id = update.message.from_user.id
 
     # find close matches to input city
-    close_matches = difflib.get_close_matches(city, list_of_cities, n=3, cutoff=0.6)
+    close_matches = difflib.get_close_matches(
+        city, list_of_cities, n=3, cutoff=0.6)
     # if there is no results
     if not len(close_matches):
         update.message.reply_text("Такого города нет в базе. Попробуй еще раз")
@@ -113,7 +115,8 @@ def select_city(update: Update, context: CallbackContext) -> str:
         print(close_matches)
         keyboard = []
         for city in close_matches:
-            keyboard.append([InlineKeyboardButton(city, callback_data=str(city))])
+            keyboard.append(
+                [InlineKeyboardButton(city, callback_data=str(city))])
         reply_markup = InlineKeyboardMarkup(keyboard)
         update.message.reply_text(
             "Найдено несколько городов. Выбери один из них", reply_markup=reply_markup
@@ -121,7 +124,7 @@ def select_city(update: Update, context: CallbackContext) -> str:
         return CITY_SELECT
     # if there is only one result
     city = close_matches[0]
-    db.users.create_one({"user_id": user_id}, {"$set": {"city_name": city}})
+    db.users.insert_one({"user_id": user_id}, {"$set": {"city_name": city}})
 
     # save city to local context
     context.user_data["city_name"] = city
@@ -136,7 +139,8 @@ def select_city(update: Update, context: CallbackContext) -> str:
                     callback_data="REGISTER",
                 )
             ],
-            [InlineKeyboardButton("Я бы нашел кого себе...", callback_data="SEARCH")],
+            [InlineKeyboardButton("Я бы нашел кого себе...",
+                                  callback_data="SEARCH")],
         ]
     )
     query.edit_message_text(
@@ -182,7 +186,7 @@ def select_hobby(update: Update, context: CallbackContext) -> str:
         update.message.reply_text("Ладно, храни свои секреты")
         return SKIP_HOBBY
     db.users.update_one({"user_id": user_id}, {"$set": {"hobby": hobby}})
-    
+
     markup = InlineKeyboardMarkup(
         [[InlineKeyboardButton("Давай потом, а", callback_data="SKIP_JOB")]]
     )
@@ -196,7 +200,7 @@ def select_hobby(update: Update, context: CallbackContext) -> str:
 def skip_hobby(update: Update, context: CallbackContext) -> str:
     user_id = update.message.from_user.id
     db.users.update_one({"user_id": user_id}, {"$set": {"hobby": ""}})
-    
+
     update.message.reply_text(
         "Двигаемся дальше\n\n"
         "Пару слов о работе накидай хотя бы. Разрешаю и про бизнес.",
@@ -231,7 +235,8 @@ def select_photo(update: Update, context: CallbackContext) -> str:
     file_id = photo.file_id
     db.users.update_one({"user_id": user_id}, {"$set": {"photo": file_id}})
     markup = InlineKeyboardMarkup(
-        [[InlineKeyboardButton("Бери с авы и не парься", callback_data="SKIP_PHOTO")]]
+        [[InlineKeyboardButton("Бери с авы и не парься",
+                               callback_data="SKIP_PHOTO")]]
     )
     update.message.reply_text(
         "Накинь еще фоточку для полного фарша", reply_markup=markup
