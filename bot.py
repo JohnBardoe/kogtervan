@@ -56,8 +56,7 @@ def error_handler(update: object, context: CallbackContext) -> None:
     )
 
     # Finally, send the message
-    context.bot.send_message(EXCEPTION_CHAT_ID, message,
-                             parse_mode=ParseMode.HTML)
+    context.bot.send_message(EXCEPTION_CHAT_ID, message, parse_mode=ParseMode.HTML)
 
 
 def start_search(update: Update, context: CallbackContext) -> str:
@@ -70,15 +69,15 @@ def start_search(update: Update, context: CallbackContext) -> str:
     if query_data == "JOB":
         # get user data
         user_data = db.users.find_one({"user_id": user_id})
-        # if user has hobby
-        if "hobby" in user_data:
-            # get user hobby
-            hobby = user_data["hobby"]
-            # get all jobs
+        if "resume" in user_data:
+            resume = user_data["resume"]
             jobs = db.jobs.find()
-            # get all jobs with similar hobby
-            similar_jobs = [job for job in jobs if difflib.SequenceMatcher(
-                None, job["hobby"], hobby).ratio() > 0.5]
+            similar_jobs = [
+                job
+                for job in jobs
+                if difflib.SequenceMatcher(None, job["description"], hobby).ratio()
+                > 0.5
+            ]
             # if there are no similar jobs
             if len(similar_jobs) == 0:
                 query.edit_message_text("Нет таких вакансий")
@@ -90,18 +89,35 @@ def start_search(update: Update, context: CallbackContext) -> str:
 
         elif query_data == "PERSON":
             # create 2 inline buttons
-            extra_tags_registered_button = InlineKeyboardMarkup(
+            extra_tags_registered_button = (
+                InlineKeyboardMarkup(
+                    [
+                        InlineKeyboardButton("Ищи как знаешь", callback_data="PERSON"),
+                    ]
+                )
+                if db.uesrs.find_one({"user_id": user_id})["hobby"]
+                else None
+            )
+            # show markup only if user is registered
+            query.edit_message_text(
+                "Что ты хочешь найти в человеке?",
+                reply_markup=extra_tags_registered_button,
+            )
+            return SEARCH_PERSON
+        elif query_data == "RENT":
+            rent_button = InlineKeyboardMarkup(
                 [
-                    InlineKeyboardButton("Ищи как знаешь", callback_data="PERSON"),
+                    InlineKeyboardButton("Сдать комнату", callback_data="RENT"),
+                    InlineKeyboardButton(
+                        "Найти собственника", callback_data="ROOMMATE"
+                    ),
                 ]
             )
-            #show markup only if user is registered
-
-            query.edit_message_text("Напиши пару слов о себе", reply_markup=extra_tags_registered_button if db.uesrs.find_one({"user_id" : user_id} else None))
-            return SEARCH_PEOPLE
+            query.edit_message_text("Ты хочешь", reply_markup=rent_button)
+            return SEARCH_RENT
         else:
-            query.edit_message_text("Нет таких вакансий")
-            return SEARCH_JOB
+            # repeat this stage
+            return SEARCH
 
 
 def start(update: Update, context: CallbackContext) -> str:
@@ -122,8 +138,7 @@ def select_city(update: Update, context: CallbackContext) -> str:
         user_id = update.message.from_user.id
 
     # find close matches to input city
-    close_matches = difflib.get_close_matches(
-        city, list_of_cities, n=3, cutoff=0.6)
+    close_matches = difflib.get_close_matches(city, list_of_cities, n=3, cutoff=0.6)
     # if there is no results
     if not len(close_matches):
         update.message.reply_text("Такого города нет в базе. Попробуй еще раз")
@@ -135,8 +150,7 @@ def select_city(update: Update, context: CallbackContext) -> str:
         print(close_matches)
         keyboard = []
         for city in close_matches:
-            keyboard.append(
-                [InlineKeyboardButton(city, callback_data=str(city))])
+            keyboard.append([InlineKeyboardButton(city, callback_data=str(city))])
         reply_markup = InlineKeyboardMarkup(keyboard)
         update.message.reply_text(
             "Найдено несколько городов. Выбери один из них", reply_markup=reply_markup
@@ -159,8 +173,7 @@ def select_city(update: Update, context: CallbackContext) -> str:
                     callback_data="REGISTER",
                 )
             ],
-            [InlineKeyboardButton("Я бы нашел кого себе...",
-                                  callback_data="SEARCH")],
+            [InlineKeyboardButton("Я бы нашел кого себе...", callback_data="SEARCH")],
         ]
     )
     query.edit_message_text(
@@ -255,8 +268,7 @@ def select_photo(update: Update, context: CallbackContext) -> str:
     file_id = photo.file_id
     db.users.update_one({"user_id": user_id}, {"$set": {"photo": file_id}})
     markup = InlineKeyboardMarkup(
-        [[InlineKeyboardButton("Бери с авы и не парься",
-                               callback_data="SKIP_PHOTO")]]
+        [[InlineKeyboardButton("Бери с авы и не парься", callback_data="SKIP_PHOTO")]]
     )
     update.message.reply_text(
         "Накинь еще фоточку для полного фарша", reply_markup=markup
@@ -306,6 +318,18 @@ def cancel(update: Update, context: CallbackContext) -> str:
 
 
 def ask_job(update: Update, context: CallbackContext) -> str:
+    user_id = update.message.from_user.id
+    # create 2 inline buttons
+    markup = InlineKeyboardMarkup(
+        [[InlineKeyboardButton("Хочу искать работу", callback_data="EMPLOYEE")]][
+            [InlineKeyboardButton("Хочу добавить вакансию", callback_data="EMPLOYER")]
+        ]
+    )
+
+    update.message.reply_text(
+        "Хочешь получать предложения о работе или добавлять вакансии?",
+        reply_markup=markup,
+    )
     return ConversationHandler.END
 
 
@@ -365,8 +389,8 @@ def registerHandlers():
     search_job_handler = ConversationHandler(
         entry_points=[CallbackQueryHandler(ask_job)],
         states={
-            EMPLOYEE: [MessageHandler(Filters.text, select_employee)],
-            EMPLOYER: [MessageHandler(Filters.text, select_employer)],
+            EMPLOYEE: [CallbackQueryHandler(select_employee)],
+            EMPLOYER: [CallbackQueryHandler(select_employer)],
         },
         fallbacks=[MessageHandler(Filters.text, cancel)],
     )
@@ -393,6 +417,7 @@ def registerHandlers():
             SEARCH_PEOPLE: [search_people_handler],
             DELETE: [MessageHandler(Filters.text, delete_user)],
         },
+        map_to_parent={SEARCH: SEARCH},
         fallbacks=[CommandHandler("cancel", cancel)],
     )
 
