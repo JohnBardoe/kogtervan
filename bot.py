@@ -392,7 +392,7 @@ def registerHandlers():
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler("start", start)],
         states={
-            CITY_SELECT: [MessageHandler(Filters.text, select_city)],
+            CITY_SELECT: [MessageHandler(Filters.text, select_city, pass_user_data=True)],
             ASK_PURPOSE: [CallbackQueryHandler(ask_purpose)],
             REGISTER: [register_handler],
             SEARCH: [search_handler]
