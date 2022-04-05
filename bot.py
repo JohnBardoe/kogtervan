@@ -398,6 +398,7 @@ def registerHandlers():
             SEARCH: [search_handler]
         },
         per_user=True,
+        allow_reentry=True,
         fallbacks=[CommandHandler("cancel", cancel)]
     )
 
