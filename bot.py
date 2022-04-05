@@ -113,7 +113,7 @@ def select_city(update: Update, context: CallbackContext) -> str:
 
     # find close matches to input city
     close_matches = difflib.get_close_matches(
-        city, list_of_cities, n=3, cutoff=0.7)
+        city, list_of_cities, n=3, cutoff=0.6)
     # if there is no results
     if not len(close_matches):
         update.message.reply_text(
