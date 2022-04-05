@@ -119,10 +119,11 @@ def start(update: Update, context: CallbackContext) -> str:
 
 
 def select_city(update: Update, context: CallbackContext) -> str:
-    user_id = update.callback_query.from_user.id
+    print(update.to_dict())
     city = update.effective_message
-
     print(city)
+    user_id = update.callback_query.from_user.id
+
     # full text search in collection cities
 
     # find close matches to input city
@@ -167,11 +168,11 @@ def select_city(update: Update, context: CallbackContext) -> str:
 
 
 def select_hobby(update: Update, context: CallbackContext) -> str:
-    
+
     print(update.de_json())
     query = update.callback_query
     user_id = update.effective_user.id
-    hobby = update.callback_query.data 
+    hobby = update.callback_query.data
     # if message is longer than 300 symbols
     if len(hobby) > 300:
         update.message.reply_text(
