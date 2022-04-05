@@ -56,8 +56,7 @@ def error_handler(update: object, context: CallbackContext) -> None:
     )
 
     # Finally, send the message
-    context.bot.send_message(EXCEPTION_CHAT_ID, message,
-                             parse_mode=ParseMode.HTML)
+    context.bot.send_message(EXCEPTION_CHAT_ID, message, parse_mode=ParseMode.HTML)
 
 
 def ask_purpose(update: Update, context: CallbackContext) -> str:
@@ -66,11 +65,13 @@ def ask_purpose(update: Update, context: CallbackContext) -> str:
 
     if query.data == "REGISTER":
         update.callback_query.message.reply_text(
-            "Накидай пару слов о себе. Хобби, характер и прочее.")
+            "Накидай пару слов о себе. Хобби, характер и прочее."
+        )
         return REGISTER
     else:
         update.callback_query.message.reply_text("Кого искать будем?")
         return SEARCH
+
 
 # start handler for searching
 
@@ -100,13 +101,10 @@ def select_city(update: Update, context: CallbackContext) -> str:
         user_id = update.message.from_user.id
 
     # find close matches to input city
-    close_matches = difflib.get_close_matches(
-        city, list_of_cities, n=3, cutoff=0.6)
+    close_matches = difflib.get_close_matches(city, list_of_cities, n=3, cutoff=0.6)
     # if there is no results
     if not len(close_matches):
-        update.message.reply_text(
-            "Такого города нет в базе. Попробуй еще раз"
-        )
+        update.message.reply_text("Такого города нет в базе. Попробуй еще раз")
         return CITY_SELECT
 
     # if there is more than one result
@@ -115,8 +113,7 @@ def select_city(update: Update, context: CallbackContext) -> str:
         print(close_matches)
         keyboard = []
         for city in close_matches:
-            keyboard.append([InlineKeyboardButton(
-                city, callback_data=str(city))])
+            keyboard.append([InlineKeyboardButton(city, callback_data=str(city))])
         reply_markup = InlineKeyboardMarkup(keyboard)
         update.message.reply_text(
             "Найдено несколько городов. Выбери один из них", reply_markup=reply_markup
@@ -124,18 +121,22 @@ def select_city(update: Update, context: CallbackContext) -> str:
         return CITY_SELECT
     # if there is only one result
     city = close_matches[0]
-    db.users.update_one({"user_id": user_id}, {
-                        "$set": {"city_name": city}})
+    db.users.update_one({"user_id": user_id}, {"$set": {"city_name": city}})
 
     # save city to local context
     context.user_data["city_name"] = city
 
     reply_markup = InlineKeyboardMarkup(
         [
-            [InlineKeyboardButton("Обновить анкету" if db.users.find_one({"user_id": user_id}) else "Создай-ка мне анкету!",
-                                  callback_data="REGISTER")],
-            [InlineKeyboardButton(
-                "Я бы нашел кого себе...", callback_data="SEARCH")],
+            [
+                InlineKeyboardButton(
+                    "Обновить анкету"
+                    if db.users.find_one({"user_id": user_id})
+                    else "Создай-ка мне анкету!",
+                    callback_data="REGISTER",
+                )
+            ],
+            [InlineKeyboardButton("Я бы нашел кого себе...", callback_data="SEARCH")],
         ]
     )
     query.edit_message_text(
@@ -152,20 +153,20 @@ def select_purpose(update: Update, context: CallbackContext) -> str:
     purpose = query.data
     if purpose == "REGISTER":
         update.callback_query.message.reply_text(
-            "Накидай пару слов о себе. Хобби, характер и прочее.")
+            "Накидай пару слов о себе. Хобби, характер и прочее."
+        )
         return REGISTER
     else:
         reply_markup = InlineKeyboardMarkup(
-         [
-             [InlineKeyboardButton("Для хобби.", callback_data="NAME")],
-             [InlineKeyboardButton("Для работы.", callback_data="CITY")],
-             [InlineKeyboardButton("Для хаты.", callback_data="RENT")],
-         ]
+            [
+                [InlineKeyboardButton("Для хобби.", callback_data="NAME")],
+                [InlineKeyboardButton("Для работы.", callback_data="CITY")],
+                [InlineKeyboardButton("Для хаты.", callback_data="RENT")],
+            ]
+        )
+    query.reply_text("Для чего ищем?", reply_markup=reply_markup)
+    return SEARCH
 
-     )
-     query.reply_text("Для чего ищем?", reply_markup=reply_markup)
-     update.callback_query.message.reply_text()
-     return SEARCH
 
 def select_hobby(update: Update, context: CallbackContext) -> str:
 
@@ -175,18 +176,15 @@ def select_hobby(update: Update, context: CallbackContext) -> str:
 
     # if message is longer than 300 symbols
     if len(hobby) > 300:
-        update.message.reply_text(
-            "Текст не должен быть длиннее 300 символов"
-        )
+        update.message.reply_text("Текст не должен быть длиннее 300 символов")
         return REGISTER
     elif len(hobby) == 0:
-        update.message.reply_text(
-            "Ладно, храни свои секреты"
-        )
+        update.message.reply_text("Ладно, храни свои секреты")
         return SKIP_HOBBY
     db.users.update_one({"user_id": user_id}, {"$set": {"hobby": hobby}})
     update.message.reply_text(
-        "Гуд! А теперь еще немного о том, откуда на хлеб берешь деньги.", reply_markup=markup
+        "Гуд! А теперь еще немного о том, откуда на хлеб берешь деньги.",
+        reply_markup=markup,
     )
     return JOB
 
@@ -195,12 +193,12 @@ def skip_hobby(update: Update, context: CallbackContext) -> str:
     user_id = update.message.from_user.id
     db.users.update_one({"user_id": user_id}, {"$set": {"hobby": ""}})
     markup = InlineKeyboardMarkup(
-        [
-            [
-                InlineKeyboardButton("Давай потом, а", callback_data="SKIP_JOB")]])
+        [[InlineKeyboardButton("Давай потом, а", callback_data="SKIP_JOB")]]
+    )
     update.message.reply_text(
         "Двигаемся дальше\n\n"
-        "Пару слов о работе накидай хотя бы. Разрешаю и про бизнес.", reply_markup=markup
+        "Пару слов о работе накидай хотя бы. Разрешаю и про бизнес.",
+        reply_markup=markup,
     )
     return JOB
 
@@ -210,21 +208,15 @@ def select_job(update: Update, context: CallbackContext) -> str:
     job = update.message.text
     # if message is longer than 300 symbols
     if len(update.message.text) > 300:
-        update.message.reply_text(
-            "Текст не должен быть длиннее 300 символов"
-        )
+        update.message.reply_text("Текст не должен быть длиннее 300 символов")
         return JOB
     elif len(update.message.text) == 0:
-        update.message.reply_text(
-            "Ладно, храни свои секреты"
-        )
+        update.message.reply_text("Ладно, храни свои секреты")
         return SKIP_HOBBY
     db.users.update_one({"user_id": user_id}, {"$set": {"job": job}})
     markup = InlineKeyboardMarkup(
-        [
-            [
-                InlineKeyboardButton(
-                    "Давай потом, а", callback_data="SKIP_JOB")]])
+        [[InlineKeyboardButton("Давай потом, а", callback_data="SKIP_JOB")]]
+    )
     update.message.reply_text(
         "Накинь еще фоточку для полного фарша", reply_markup=markup
     )
@@ -237,10 +229,8 @@ def select_photo(update: Update, context: CallbackContext) -> str:
     file_id = photo.file_id
     db.users.update_one({"user_id": user_id}, {"$set": {"photo": file_id}})
     markup = InlineKeyboardMarkup(
-        [
-            [
-                InlineKeyboardButton(
-                    "Бери с авы и не парься", callback_data="SKIP_PHOTO")]])
+        [[InlineKeyboardButton("Бери с авы и не парься", callback_data="SKIP_PHOTO")]]
+    )
     update.message.reply_text(
         "Накинь еще фоточку для полного фарша", reply_markup=markup
     )
@@ -249,11 +239,14 @@ def select_photo(update: Update, context: CallbackContext) -> str:
 
 def skip_photo(update: Update, context: CallbackContext) -> str:
     user_id = update.message.from_user.id
-    db.users.update_one({"user_id": user_id}, {
-                        "$set": {"photo": update.message.from_user.profile_photo_file_id}})
+    db.users.update_one(
+        {"user_id": user_id},
+        {"$set": {"photo": update.message.from_user.profile_photo_file_id}},
+    )
     update.message.reply_text(
         "Двигаемся дальше\n\n"
-        "Пару слов о работе накидай хотя бы. Разрешаю и про бизнес.", reply_markup=markup
+        "Пару слов о работе накидай хотя бы. Разрешаю и про бизнес.",
+        reply_markup=markup,
     )
     return JOB
 
@@ -262,10 +255,8 @@ def skip_job(update: Update, context: CallbackContext) -> str:
     user_id = update.message.from_user.id
     db.users.update_one({"user_id": user_id}, {"$set": {"job": ""}})
     markup = InlineKeyboardMarkup(
-        [
-            [
-                InlineKeyboardButton(
-                    "Давай потом, а", callback_data="SKIP_PHOTO")]])
+        [[InlineKeyboardButton("Давай потом, а", callback_data="SKIP_PHOTO")]]
+    )
 
     update.message.reply_text(
         "Не очень-то и хотелось. Давай фотку хотяб.", reply_markup=markup
@@ -277,6 +268,7 @@ def delete_user(update: Update, context: CallbackContext) -> str:
     user_id = update.message.from_user.id
     db.users.delete_one({"user_id": user_id})
     update.message.reply_text("Пока.")
+
 
 # cancel handler
 
@@ -326,33 +318,30 @@ def registerHandlers():
     print("Registering handlers...")
     dp = updater.dispatcher
     search_people_handler = ConversationHandler(
-        entry_points=[CallbackQueryHandler(
-            ask_people)],
+        entry_points=[CallbackQueryHandler(ask_people)],
         states={
             AUTO: [MessageHandler(Filters.text, select_room)],
             TAGS: [MessageHandler(Filters.text, select_roommate)],
         },
-        fallbacks=[CommandHandler('cancel', cancel)]
+        fallbacks=[CommandHandler("cancel", cancel)],
     )
 
     search_rent_handler = ConversationHandler(
-        entry_points=[CallbackQueryHandler(
-            ask_rent_type)],
+        entry_points=[CallbackQueryHandler(ask_rent_type)],
         states={
             ROOM: [MessageHandler(Filters.text, select_room)],
             ROOMMATE: [MessageHandler(Filters.text, select_roommate)],
         },
-        fallbacks=[CommandHandler('cancel', cancel)]
+        fallbacks=[CommandHandler("cancel", cancel)],
     )
 
     search_job_handler = ConversationHandler(
-        entry_points=[CallbackQueryHandler(
-            ask_job)],
+        entry_points=[CallbackQueryHandler(ask_job)],
         states={
             EMPLOYEE: [MessageHandler(Filters.text, select_employee)],
             EMPLOYER: [MessageHandler(Filters.text, select_employer)],
         },
-        fallbacks=[MessageHandler(Filters.text, cancel)]
+        fallbacks=[MessageHandler(Filters.text, cancel)],
     )
 
     register_handler = ConversationHandler(
@@ -362,39 +351,38 @@ def registerHandlers():
             JOB: [MessageHandler(Filters.text, select_job)],
             SKIP_JOB: [MessageHandler(Filters.text, skip_job)],
             PHOTO: [MessageHandler(Filters.photo, select_photo)],
-            SKIP_PHOTO: [MessageHandler(Filters.text, skip_photo)]
+            SKIP_PHOTO: [MessageHandler(Filters.text, skip_photo)],
         },
-        fallbacks=[CommandHandler('cancel', cancel)],
-        map_to_parent={
-            REGISTER: REGISTER
-        }
+        fallbacks=[CommandHandler("cancel", cancel)],
+        map_to_parent={REGISTER: REGISTER},
     )
 
     search_handler = ConversationHandler(
-        entry_points=[
-            CallbackQueryHandler(start_search)],
+        entry_points=[CallbackQueryHandler(start_search)],
         # search for flats, jobs or people
         states={
             SEARCH_RENT: [search_rent_handler],
             SEARCH_JOB: [search_job_handler],
             SEARCH_PEOPLE: [search_people_handler],
-            DELETE: [MessageHandler(Filters.text, delete_user)]
+            DELETE: [MessageHandler(Filters.text, delete_user)],
         },
-        fallbacks=[CommandHandler('cancel', cancel)],
+        fallbacks=[CommandHandler("cancel", cancel)],
     )
 
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler("start", start)],
         states={
-            CITY_SELECT: [CallbackQueryHandler(select_city), MessageHandler(Filters.text, select_city),
-                          ],
+            CITY_SELECT: [
+                CallbackQueryHandler(select_city),
+                MessageHandler(Filters.text, select_city),
+            ],
             ASK_PURPOSE: [CallbackQueryHandler(select_purpose)],
             REGISTER: [register_handler],
             SEARCH: [search_handler],
         },
         per_user=True,
         allow_reentry=True,
-        fallbacks=[CommandHandler("cancel", cancel)]
+        fallbacks=[CommandHandler("cancel", cancel)],
     )
 
     # register handler
