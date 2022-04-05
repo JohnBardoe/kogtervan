@@ -119,12 +119,8 @@ def start(update: Update, context: CallbackContext) -> str:
 
 
 def select_city(update: Update, context: CallbackContext) -> str:
-    user_id = update.message.from_user.id
-    if update.message.text:
-        city = update.message.text
-    else:
-        update.callback_query.answer()
-        city = update.callback_query.data
+    user_id = update.callback_query.from_user.id
+    city = update.effective_message
 
     print(city)
     # full text search in collection cities
