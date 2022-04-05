@@ -123,14 +123,14 @@ def select_city(update: Update, context: CallbackContext) -> str:
         return CITY_SELECT
 
     # if there is more than one result
-    elif len(close_matches) > 1 or query:
+    elif len(close_matches) > 1 or not query:
         # create keyboard with results
         keyboard = []
         for city in close_matches:
             keyboard.append([InlineKeyboardButton(
                 city, callback_data=str(city))])
         reply_markup = InlineKeyboardMarkup(keyboard)
-        query.edit_message_text(
+        update.message.reply_text(
             "Найдено несколько городов. Выбери один из них", reply_markup=reply_markup
         )
         return CITY_SELECT
