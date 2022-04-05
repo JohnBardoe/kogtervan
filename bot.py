@@ -119,7 +119,7 @@ def start(update: Update, context: CallbackContext) -> str:
 
 
 def select_city(update: Update, context: CallbackContext) -> str:
-    user_input = update.message.text
+    user_input = update.effective_message.text
     # get user_data context
     user_data = context.user_data
     # set new context user_input
@@ -128,8 +128,7 @@ def select_city(update: Update, context: CallbackContext) -> str:
 
     print(user_input)
 
-    user_id = update.callback_query.from_user.id
-
+    user_id = update.effective_user.id
     # full text search in collection cities
 
     # find close matches to input city
@@ -175,7 +174,6 @@ def select_city(update: Update, context: CallbackContext) -> str:
 
 def select_hobby(update: Update, context: CallbackContext) -> str:
 
-    print(update.de_json())
     query = update.callback_query
     user_id = update.effective_user.id
     hobby = update.callback_query.data
