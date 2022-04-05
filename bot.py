@@ -130,7 +130,7 @@ def select_city(update: Update, context: CallbackContext) -> str:
             keyboard.append([InlineKeyboardButton(
                 city, callback_data=str(city))])
         reply_markup = InlineKeyboardMarkup(keyboard)
-        update.message.reply_text(
+        query.edit_message_text(
             "Найдено несколько городов. Выбери один из них", reply_markup=reply_markup
         )
         return CITY_SELECT
