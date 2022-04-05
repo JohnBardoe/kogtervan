@@ -119,9 +119,15 @@ def start(update: Update, context: CallbackContext) -> str:
 
 
 def select_city(update: Update, context: CallbackContext) -> str:
-    print(update.to_dict())
-    city = update.effective_message
-    print(city)
+    user_input = update.message.text
+    # get user_data context
+    user_data = context.user_data
+    # set new context user_input
+    user_data['user_input'] = user_input
+    context.user_data['user_input'] = user_data['user_input']
+
+    print(user_input)
+
     user_id = update.callback_query.from_user.id
 
     # full text search in collection cities
@@ -392,7 +398,7 @@ def registerHandlers():
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler("start", start)],
         states={
-            CITY_SELECT: [CallbackQueryHandler(select_city)],
+            CITY_SELECT: [MessageHandler(select_city)],
             ASK_PURPOSE: [CallbackQueryHandler(ask_purpose)],
             REGISTER: [register_handler],
             SEARCH: [search_handler]
