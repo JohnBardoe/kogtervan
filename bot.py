@@ -146,7 +146,7 @@ def select_city(update: Update, context: CallbackContext) -> str:
         keyboard = []
         for city in close_matches:
             keyboard.append([InlineKeyboardButton(
-                city, callback_data=city)])
+                city, callback_data=str(city))])
         reply_markup = InlineKeyboardMarkup(keyboard)
         update.message.reply_text(
             "Найдено несколько городов. Выбери один из них", reply_markup=reply_markup
@@ -399,6 +399,7 @@ def registerHandlers():
             REGISTER: [register_handler],
             SEARCH: [search_handler]
         },
+        per_user=True,
         fallbacks=[CommandHandler("cancel", cancel)]
     )
 
