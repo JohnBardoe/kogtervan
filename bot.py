@@ -147,7 +147,6 @@ def select_city(update: Update, context: CallbackContext) -> str:
 
 def select_purpose(update: Update, context: CallbackContext) -> str:
     query = update.callback_query
-    query.answer()
     purpose = query.data
     user_id = query.from_user.id
     city = context.user_data["city_name"]
@@ -163,6 +162,7 @@ def select_purpose(update: Update, context: CallbackContext) -> str:
         f"Ну и зачем тебе {city}?",
         reply_markup=reply_markup,
     )
+    query.answer()
 
 
 def select_hobby(update: Update, context: CallbackContext) -> str:
