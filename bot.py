@@ -119,9 +119,14 @@ def start(update: Update, context: CallbackContext) -> str:
 
 
 def select_city(update: Update, context: CallbackContext) -> str:
-    
-    city = update.effective_message.text
-    user_id = update.effective_user.id
+    query = update.callback_query
+    if query:
+        query.answer()
+        city = query.data
+        user_id = query.from_user.id
+    else:
+        city = update.message.text
+        user_id = update.message.from_user.id
 
     # find close matches to input city
     close_matches = difflib.get_close_matches(
@@ -392,7 +397,8 @@ def registerHandlers():
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler("start", start)],
         states={
-            CITY_SELECT: [MessageHandler(Filters.text, select_city, pass_user_data=True)],
+            CITY_SELECT: [MessageHandler((Filters.text | Filters.), select_city, pass_user_data=True),
+                          CallbackQueryHandler(select_city, pass_user_data=True)],
             ASK_PURPOSE: [CallbackQueryHandler(ask_purpose)],
             REGISTER: [register_handler],
             SEARCH: [search_handler]
