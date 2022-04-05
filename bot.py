@@ -354,7 +354,7 @@ def registerHandlers():
     )
 
     register_handler = ConversationHandler(
-        entry_points=[MessageHandler(select_hobby)],
+        entry_points=[MessageHandler(Filters.text, select_hobby)],
         states={
             SKIP_HOBBY: [MessageHandler(Filters.text, skip_hobby)],
             JOB: [MessageHandler(Filters.text, select_job)],
