@@ -167,15 +167,16 @@ def select_purpose(update: Update, context: CallbackContext) -> str:
 
 def select_hobby(update: Update, context: CallbackContext) -> str:
 
-    query = update.callback_query
-    user_id = update.effective_user.id
-    hobby = update.callback_query.data
+    #get user id and hobby
+    user_id = update.message.from_user.id
+    hobby = update.message.text
+
     # if message is longer than 300 symbols
     if len(hobby) > 300:
         update.message.reply_text(
             "Текст не должен быть длиннее 300 символов"
         )
-        return HOBBY
+        return REGISTER 
     elif len(hobby) == 0:
         update.message.reply_text(
             "Ладно, храни свои секреты"
@@ -353,7 +354,7 @@ def registerHandlers():
     )
 
     register_handler = ConversationHandler(
-        entry_points=[CallbackQueryHandler(select_hobby)],
+        entry_points=[MessageHandler(select_hobby)],
         states={
             SKIP_HOBBY: [MessageHandler(Filters.text, skip_hobby)],
             JOB: [MessageHandler(Filters.text, select_job)],
@@ -361,7 +362,10 @@ def registerHandlers():
             PHOTO: [MessageHandler(Filters.photo, select_photo)],
             SKIP_PHOTO: [MessageHandler(Filters.text, skip_photo)]
         },
-        fallbacks=[CommandHandler('cancel', cancel)]
+        fallbacks=[CommandHandler('cancel', cancel)],
+        map_to_parent={
+            REGISTER: REGISTER 
+        }
     )
 
     search_handler = ConversationHandler(
