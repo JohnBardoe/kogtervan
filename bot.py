@@ -67,10 +67,10 @@ def ask_purpose(update: Update, context: CallbackContext) -> str:
     if query.data == "REGISTER":
         update.callback_query.message.reply_text(
             "Накидай пару слов о себе. Хобби, характер и прочее.")
-        return
-    else
-    update.callback_query.message.reply_text("Кого искать будем?")
-
+        return REGISTER
+    else:
+        update.callback_query.message.reply_text("Кого искать будем?")
+        return SEARCH
 
 # start handler for searching
 
