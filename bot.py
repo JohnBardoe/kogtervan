@@ -152,7 +152,7 @@ def select_purpose(update: Update, context: CallbackContext) -> str:
     city = context.user_data["city_name"]
     reply_markup = InlineKeyboardMarkup(
         [
-            [InlineKeyboardButton((db.users.find_one({"user_id": user_id})) ? "Обновить анкету": "Зарегистрируй меня!",
+            [InlineKeyboardButton("Обновить анкету" if db.users.find_one({"user_id": user_id}) else "Зарегистрируй меня!",
                                   callback_data="REGISTER")],
             [InlineKeyboardButton(
                 "Я бы нашел кого себе...", callback_data="SEARCH")],
