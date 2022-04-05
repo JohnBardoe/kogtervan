@@ -182,6 +182,10 @@ def select_hobby(update: Update, context: CallbackContext) -> str:
         update.message.reply_text("Ладно, храни свои секреты")
         return SKIP_HOBBY
     db.users.update_one({"user_id": user_id}, {"$set": {"hobby": hobby}})
+    
+    markup = InlineKeyboardMarkup(
+        [[InlineKeyboardButton("Давай потом, а", callback_data="SKIP_JOB")]]
+    )
     update.message.reply_text(
         "Гуд! А теперь еще немного о том, откуда на хлеб берешь деньги.",
         reply_markup=markup,
@@ -192,9 +196,7 @@ def select_hobby(update: Update, context: CallbackContext) -> str:
 def skip_hobby(update: Update, context: CallbackContext) -> str:
     user_id = update.message.from_user.id
     db.users.update_one({"user_id": user_id}, {"$set": {"hobby": ""}})
-    markup = InlineKeyboardMarkup(
-        [[InlineKeyboardButton("Давай потом, а", callback_data="SKIP_JOB")]]
-    )
+    
     update.message.reply_text(
         "Двигаемся дальше\n\n"
         "Пару слов о работе накидай хотя бы. Разрешаю и про бизнес.",
