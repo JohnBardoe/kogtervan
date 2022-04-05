@@ -113,7 +113,7 @@ def select_city(update: Update, context: CallbackContext) -> str:
 
     # find close matches to input city
     close_matches = difflib.get_close_matches(
-        city, list_of_cities, n=3, cutoff=0.8)
+        city, list_of_cities, n=3, cutoff=0.7)
     # if there is no results
     if not len(close_matches):
         update.message.reply_text(
@@ -380,8 +380,8 @@ def registerHandlers():
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler("start", start)],
         states={
-            CITY_SELECT: [MessageHandler(Filters.text, select_city),
-                          CallbackQueryHandler(select_city)],
+            CITY_SELECT: [CallbackQueryHandler(select_city), MessageHandler(Filters.text, select_city),
+                          ],
             ASK_PURPOSE: [CallbackQueryHandler(select_purpose)],
             REGISTER: [register_handler],
             SEARCH: [search_handler],
