@@ -119,17 +119,8 @@ def start(update: Update, context: CallbackContext) -> str:
 
 
 def select_city(update: Update, context: CallbackContext) -> str:
-    update.callback_query.answer()
-    query = update.callback_query
-    city = query.data
-    # get user_data context
-    if not query.data:
-        city = update.effective_message.text
-        user_data = context.user_data
-        # set new context user_input
-        user_data['user_input'] = city
-        context.user_data['user_input'] = user_data['user_input']
     
+    city = update.effective_message.text
     user_id = update.effective_user.id
 
     # find close matches to input city
@@ -154,6 +145,10 @@ def select_city(update: Update, context: CallbackContext) -> str:
         update.message.reply_text(
             "Найдено несколько городов. Выбери один из них", reply_markup=reply_markup
         )
+        user_data = context.user_data
+        # set new context user_input
+        user_data['user_input'] = city
+        context.user_data['user_input'] = user_data['user_input']
         return CITY_SELECT
     # if there is only one result
     city = close_matches[0]
