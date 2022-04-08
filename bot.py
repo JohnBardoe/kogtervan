@@ -171,13 +171,6 @@ def select_city(update: Update, context: CallbackContext) -> str:
     # if there is only one result
     if not query:
         city = close_matches[0]["name"]
-    #if user exists in db
-    if db.users.find_one({"user_id": user_id}):
-        # update user city
-        db.users.update_one({"user_id": user_id}, {"$set": {"city": city}})
-    else:
-        db.users.insert_one({"user_id": user_id, "city_name": city})
-
     # save city to local context
     context.user_data["city_name"] = city
 
@@ -199,6 +192,12 @@ def select_city(update: Update, context: CallbackContext) -> str:
         f"Ну и зачем тебе {city}?",
         reply_markup=reply_markup,
     )
+    # if user exists in db
+    if db.users.find_one({"user_id": user_id}):
+        # update user city
+        db.users.update_one({"user_id": user_id}, {"$set": {"city": city}})
+    else:
+        db.users.insert_one({"user_id": user_id, "city_name": city})
 
     return ASK_PURPOSE
 
