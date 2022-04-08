@@ -157,7 +157,7 @@ def select_city(update: Update, context: CallbackContext) -> str:
         print(close_matches)
         keyboard = []
         for city in close_matches:
-            keyboard.append([InlineKeyboardButton(city["name"], callback_data=str(city))])
+            keyboard.append([InlineKeyboardButton(city["name"], callback_data=str(city["name"]))])
         reply_markup = InlineKeyboardMarkup(keyboard)
         update.message.reply_text(
             "Найдено несколько городов. Выбери один из них", reply_markup=reply_markup
