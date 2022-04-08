@@ -25,7 +25,7 @@ import difflib
 ########STRUCTURE########
 REGISTER, SEARCH, ASK_PURPOSE, CITY_SELECT = range(4)
 SEARCH_JOB, SEARCH_RENT, SEARCH_PEOPLE, DELETE = range(4)
-HOBBY, JOB, PHOTO, = range(3)
+HOBBY, JOB, PHOTO = range(3)
 EMPLOYEE, EMPLOYER = range(2)
 ROOM, ROOMMATE = range(2)
 AUTO, TAGS = range(2)
@@ -237,13 +237,14 @@ def select_hobby(update: Update, context: CallbackContext) -> str:
     update.message.reply_text(
         "Гуд! А теперь еще немного о том, откуда на хлеб берешь деньги.",
     )
+    print("ретерню джоб")
     return JOB
 
 
 def select_job(update: Update, context: CallbackContext) -> str:
     user_id = update.message.from_user.id
     job = update.message.text
-    
+
     print("Selecting job, got:", job)
 
     # if message is longer than 300 symbols
@@ -264,7 +265,7 @@ def select_photo(update: Update, context: CallbackContext) -> str:
     photo = update.message.photo[-1]
     file_id = photo.file_id
     db.users.update_one({"user_id": user_id}, {"$set": {"photo": file_id}})
-    return SEARCH 
+    return SEARCH
 
 
 def delete_user(update: Update, context: CallbackContext) -> str:
@@ -290,7 +291,7 @@ def ask_job(update: Update, context: CallbackContext) -> str:
     user = db.users.find_one({"user_id": user_id})
 
     if query.data == "EMPLOYEE":
-        # if user with this id has resume in 
+        # if user with this id has resume in
         if user["job"] is not None:
             query.edit_message_text(
                 "Ты уже написал о работе. Напиши еще о хобби."
@@ -303,7 +304,7 @@ def ask_job(update: Update, context: CallbackContext) -> str:
             return JOB
         pass
     elif query.data == "EMPLOYER":
-        #search for jobs with this user_id
+        # search for jobs with this user_id
         jobs = db.jobs.find({"user_id": user_id})
         if len(jobs) == 0:
             update.callback_query.message.reply_text(
@@ -372,7 +373,7 @@ def registerHandlers():
             TAGS: [MessageHandler(Filters.text, select_person_tags)],
         },
         fallbacks=[CommandHandler("cancel", cancel)],
-        map_to_parent= {REGISTER: REGISTER}
+        map_to_parent={REGISTER: REGISTER}
     )
 
     search_rent_handler = ConversationHandler(
@@ -382,7 +383,7 @@ def registerHandlers():
             ROOMMATE: [MessageHandler(Filters.text, select_roommate)],
         },
         fallbacks=[CommandHandler("cancel", cancel)],
-        map_to_parent= {REGISTER: REGISTER}
+        map_to_parent={REGISTER: REGISTER}
     )
 
     search_job_handler = ConversationHandler(
@@ -392,7 +393,7 @@ def registerHandlers():
             EMPLOYER: [CallbackQueryHandler(select_employer)],
         },
         fallbacks=[MessageHandler(Filters.text, cancel)],
-        map_to_parent= {REGISTER: REGISTER}
+        map_to_parent={REGISTER: REGISTER}
     )
 
     register_handler = ConversationHandler(
@@ -414,7 +415,7 @@ def registerHandlers():
             SEARCH_PEOPLE: [search_people_handler],
             DELETE: [MessageHandler(Filters.text, delete_user)],
         },
-        map_to_parent={SEARCH: SEARCH, REGISTER : REGISTER},
+        map_to_parent={SEARCH: SEARCH, REGISTER: REGISTER},
         fallbacks=[CommandHandler("cancel", cancel)],
     )
 
