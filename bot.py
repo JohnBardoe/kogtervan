@@ -25,7 +25,7 @@ import difflib
 ########STRUCTURE########
 REGISTER, SEARCH, ASK_PURPOSE, CITY_SELECT = range(4)
 SEARCH_JOB, SEARCH_RENT, SEARCH_PEOPLE, DELETE = range(4)
-HOBBY, SKIP_HOBBY, JOB, SKIP_JOB, PHOTO, SKIP_PHOTO = range(6)
+HOBBY, JOB, PHOTO, = range(3)
 EMPLOYEE, EMPLOYER = range(2)
 ROOM, ROOMMATE = range(2)
 AUTO, TAGS = range(2)
@@ -56,7 +56,20 @@ def error_handler(update: object, context: CallbackContext) -> None:
     )
 
     # Finally, send the message
-    context.bot.send_message(EXCEPTION_CHAT_ID, message, parse_mode=ParseMode.HTML)
+    context.bot.send_message(EXCEPTION_CHAT_ID, message,
+                             parse_mode=ParseMode.HTML)
+
+# get closest matches in collection in db
+
+
+def get_close_matches(collection, parameter, value, num_matches=3, cutoff=0.6):
+    docs = collection.find()
+    similar_docs = [ doc for doc in docs if difflib.SequenceMatcher(None, doc[parameter], value).ratio() > cutoff]
+
+    return similar_docs[:num_matches]
+
+
+    return difflib.get_close_matches(value, [i[parameter] for i in collection.find()])
 
 
 def start_search(update: Update, context: CallbackContext) -> str:
@@ -71,13 +84,7 @@ def start_search(update: Update, context: CallbackContext) -> str:
         user_data = db.users.find_one({"user_id": user_id})
         if "resume" in user_data:
             resume = user_data["resume"]
-            jobs = db.jobs.find()
-            similar_jobs = [
-                job
-                for job in jobs
-                if difflib.SequenceMatcher(None, job["description"], hobby).ratio()
-                > 0.5
-            ]
+            similar_jobs = get_close_matches(db.jobs, "description", resume)
             # if there are no similar jobs
             if len(similar_jobs) == 0:
                 query.edit_message_text("Нет таких вакансий")
@@ -138,7 +145,7 @@ def select_city(update: Update, context: CallbackContext) -> str:
         user_id = update.message.from_user.id
 
     # find close matches to input city
-    close_matches = difflib.get_close_matches(city, list_of_cities, n=3, cutoff=0.6)
+    close_matches = get_close_matches(db.cities, "name", city)
     # if there is no results
     if not len(close_matches):
         update.message.reply_text("Такого города нет в базе. Попробуй еще раз")
@@ -157,7 +164,7 @@ def select_city(update: Update, context: CallbackContext) -> str:
         )
         return CITY_SELECT
     # if there is only one result
-    city = close_matches[0]
+    city = close_matches[0]["name"]
     db.users.insert_one({"user_id": user_id}, {"$set": {"city_name": city}})
 
     # save city to local context
@@ -216,28 +223,11 @@ def select_hobby(update: Update, context: CallbackContext) -> str:
         update.message.reply_text("Текст не должен быть длиннее 300 символов")
         return REGISTER
     elif len(hobby) == 0:
-        update.message.reply_text("Ладно, храни свои секреты")
-        return SKIP_HOBBY
+        update.message.reply_text("Ладно, храни свои секреты. Но о рабочем опыте все-таки напиши.")
+        return JOB
     db.users.update_one({"user_id": user_id}, {"$set": {"hobby": hobby}})
-
-    markup = InlineKeyboardMarkup(
-        [[InlineKeyboardButton("Давай потом, а", callback_data="SKIP_JOB")]]
-    )
     update.message.reply_text(
         "Гуд! А теперь еще немного о том, откуда на хлеб берешь деньги.",
-        reply_markup=markup,
-    )
-    return JOB
-
-
-def skip_hobby(update: Update, context: CallbackContext) -> str:
-    user_id = update.message.from_user.id
-    db.users.update_one({"user_id": user_id}, {"$set": {"hobby": ""}})
-
-    update.message.reply_text(
-        "Двигаемся дальше\n\n"
-        "Пару слов о работе накидай хотя бы. Разрешаю и про бизнес.",
-        reply_markup=markup,
     )
     return JOB
 
@@ -253,11 +243,8 @@ def select_job(update: Update, context: CallbackContext) -> str:
         update.message.reply_text("Ладно, храни свои секреты")
         return SKIP_HOBBY
     db.users.update_one({"user_id": user_id}, {"$set": {"job": job}})
-    markup = InlineKeyboardMarkup(
-        [[InlineKeyboardButton("Давай потом, а", callback_data="SKIP_JOB")]]
-    )
     update.message.reply_text(
-        "Накинь еще фоточку для полного фарша", reply_markup=markup
+        "Накинь еще фоточку для полного фарша"
     )
     return PHOTO
 
@@ -272,33 +259,6 @@ def select_photo(update: Update, context: CallbackContext) -> str:
     )
     update.message.reply_text(
         "Накинь еще фоточку для полного фарша", reply_markup=markup
-    )
-    return ConversationHandler.END
-
-
-def skip_photo(update: Update, context: CallbackContext) -> str:
-    user_id = update.message.from_user.id
-    db.users.update_one(
-        {"user_id": user_id},
-        {"$set": {"photo": update.message.from_user.profile_photo_file_id}},
-    )
-    update.message.reply_text(
-        "Двигаемся дальше\n\n"
-        "Пару слов о работе накидай хотя бы. Разрешаю и про бизнес.",
-        reply_markup=markup,
-    )
-    return JOB
-
-
-def skip_job(update: Update, context: CallbackContext) -> str:
-    user_id = update.message.from_user.id
-    db.users.update_one({"user_id": user_id}, {"$set": {"job": ""}})
-    markup = InlineKeyboardMarkup(
-        [[InlineKeyboardButton("Давай потом, а", callback_data="SKIP_PHOTO")]]
-    )
-
-    update.message.reply_text(
-        "Не очень-то и хотелось. Давай фотку хотяб.", reply_markup=markup
     )
     return ConversationHandler.END
 
@@ -342,10 +302,28 @@ def select_employer(update: Update, context: CallbackContext) -> str:
 
 
 def ask_rent_type(update: Update, context: CallbackContext) -> str:
-    return ConversationHandler.END
+    user_id = update.message.from_user.id
+    # get query data from last choice
+    query = update.callback_query
+    data = query.data
+    context.user_data["rent_choice"] = data
+    if data == "RENT":
+        update.message.reply_text("Опиши, что сдаешь в аренду")
+        return ROOM
+    elif data == "ROOMMATE":
+        update.message.reply_text("Напиши, что ищешь в аренду")
+        return ROOMMATE
 
 
 def select_room(update: Update, context: CallbackContext) -> str:
+    # get message text
+    user_id = update.message.from_user.id
+    room = update.message.text
+
+    # select closest matching room from db by description
+
+
+
     return ConversationHandler.END
 
 
@@ -371,8 +349,8 @@ def registerHandlers():
     search_people_handler = ConversationHandler(
         entry_points=[CallbackQueryHandler(ask_people)],
         states={
-            AUTO: [MessageHandler(Filters.text, select_room)],
-            TAGS: [MessageHandler(Filters.text, select_roommate)],
+            AUTO: [MessageHandler(Filters.text, select_person_auto)],
+            TAGS: [MessageHandler(Filters.text, select_person_tags)],
         },
         fallbacks=[CommandHandler("cancel", cancel)],
     )
@@ -398,11 +376,8 @@ def registerHandlers():
     register_handler = ConversationHandler(
         entry_points=[MessageHandler(Filters.text, select_hobby)],
         states={
-            SKIP_HOBBY: [MessageHandler(Filters.text, skip_hobby)],
             JOB: [MessageHandler(Filters.text, select_job)],
-            SKIP_JOB: [MessageHandler(Filters.text, skip_job)],
             PHOTO: [MessageHandler(Filters.photo, select_photo)],
-            SKIP_PHOTO: [MessageHandler(Filters.text, skip_photo)],
         },
         fallbacks=[CommandHandler("cancel", cancel)],
         map_to_parent={REGISTER: REGISTER},
