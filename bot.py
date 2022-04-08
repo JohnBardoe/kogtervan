@@ -64,10 +64,10 @@ def error_handler(update: object, context: CallbackContext) -> None:
 
 def get_close_matches(collection, parameter, value, num_matches=3, cutoff=0.6):
     docs = collection.find()
-    similar_docs = [ doc for doc in docs if difflib.SequenceMatcher(None, doc[parameter], value).ratio() > cutoff]
+    similar_docs = [doc for doc in docs if difflib.SequenceMatcher(
+        None, doc[parameter], value).ratio() > cutoff]
 
     return similar_docs[:num_matches]
-
 
     return difflib.get_close_matches(value, [i[parameter] for i in collection.find()])
 
@@ -77,7 +77,7 @@ def start_search(update: Update, context: CallbackContext) -> str:
     query = update.callback_query
     user_id = query.from_user.id
     query_data = query.data
-    
+
     query.answer()
     print("Start search for ", query_data)
 
@@ -97,34 +97,35 @@ def start_search(update: Update, context: CallbackContext) -> str:
                 # get all jobs names
                 job_names = [job["name"] for job in similar_jobs]
 
-        elif query_data == "PERSON":
-            # create 2 inline buttons
-            extra_tags_registered_button = (
-                InlineKeyboardMarkup(
-                    [
-                        InlineKeyboardButton("Ищи как знаешь", callback_data="PERSON"),
-                    ]
-                )
-                if db.uesrs.find_one({"user_id": user_id})["hobby"]
-                else None
-            )
-            # show markup only if user is registered
-            query.edit_message_text(
-                "Что ты хочешь найти в человеке?",
-                reply_markup=extra_tags_registered_button,
-            )
-            return SEARCH_PERSON
-        elif query_data == "RENT":
-            rent_button = InlineKeyboardMarkup(
+    elif query_data == "PERSON":
+        # create 2 inline buttons
+        extra_tags_registered_button = (
+            InlineKeyboardMarkup(
                 [
-                    InlineKeyboardButton("Сдать комнату", callback_data="RENT"),
                     InlineKeyboardButton(
-                        "Найти собственника", callback_data="ROOMMATE"
-                    ),
+                        "Ищи как знаешь", callback_data="PERSON"),
                 ]
             )
-            query.edit_message_text("Ты хочешь", reply_markup=rent_button)
-            return SEARCH_RENT
+            if db.uesrs.find_one({"user_id": user_id})["hobby"]
+            else None
+        )
+        # show markup only if user is registered
+        query.edit_message_text(
+            "Что ты хочешь найти в человеке?",
+            reply_markup=extra_tags_registered_button,
+        )
+        return SEARCH_PERSON
+   elif query_data == "RENT":
+       rent_button = InlineKeyboardMarkup(
+           [
+               InlineKeyboardButton("Сдать комнату", callback_data="RENT"),
+               InlineKeyboardButton(
+                   "Найти собственника", callback_data="ROOMMATE"
+               ),
+           ]
+       )
+       query.edit_message_text("Ты хочешь", reply_markup=rent_button)
+       return SEARCH_RENT
         else:
             # repeat this stage
             return SEARCH
