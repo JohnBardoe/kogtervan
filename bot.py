@@ -77,6 +77,8 @@ def start_search(update: Update, context: CallbackContext) -> str:
     query = update.callback_query
     user_id = query.from_user.id
     query_data = query.data
+    
+    print("Start search for ", query_data)
 
     # if user is looking for job
     if query_data == "JOB":
@@ -205,7 +207,7 @@ def select_purpose(update: Update, context: CallbackContext) -> str:
         reply_markup = InlineKeyboardMarkup(
             [
                 [InlineKeyboardButton("Для хобби.", callback_data="PERSON")],
-                [InlineKeyboardButton("Для работы.", callback_data="CITY")],
+                [InlineKeyboardButton("Для работы.", callback_data="JOB")],
                 [InlineKeyboardButton("Для хаты.", callback_data="RENT")],
             ]
         )
