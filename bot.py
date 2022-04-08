@@ -262,14 +262,7 @@ def select_photo(update: Update, context: CallbackContext) -> str:
     photo = update.message.photo[-1]
     file_id = photo.file_id
     db.users.update_one({"user_id": user_id}, {"$set": {"photo": file_id}})
-    markup = InlineKeyboardMarkup(
-        [[InlineKeyboardButton("Бери с авы и не парься",
-                               callback_data="SKIP_PHOTO")]]
-    )
-    update.message.reply_text(
-        "Накинь еще фоточку для полного фарша", reply_markup=markup
-    )
-    return 
+    return SEARCH 
 
 
 def delete_user(update: Update, context: CallbackContext) -> str:
