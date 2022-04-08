@@ -78,6 +78,7 @@ def start_search(update: Update, context: CallbackContext) -> str:
     user_id = query.from_user.id
     query_data = query.data
     
+    query.answer()
     print("Start search for ", query_data)
 
     # if user is looking for job
