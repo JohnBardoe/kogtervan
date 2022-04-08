@@ -229,10 +229,6 @@ def select_hobby(update: Update, context: CallbackContext) -> str:
     if len(hobby) > 300:
         update.message.reply_text("Текст не должен быть длиннее 300 символов")
         return REGISTER
-    elif len(hobby) == 0:
-        update.message.reply_text(
-            "Ладно, храни свои секреты. Но о рабочем опыте все-таки напиши.")
-        return JOB
     db.users.update_one({"user_id": user_id}, {"$set": {"hobby": hobby}})
     update.message.reply_text(
         "Гуд! А теперь еще немного о том, откуда на хлеб берешь деньги.",
@@ -251,8 +247,6 @@ def select_job(update: Update, context: CallbackContext) -> str:
     if len(update.message.text) > 300:
         update.message.reply_text("Текст не должен быть длиннее 300 символов")
         return JOB
-    elif len(job) == 0:
-        update.message.reply_text("Ладно, храни свои секреты")
     db.users.update_one({"user_id": user_id}, {"$set": {"job": job}})
     update.message.reply_text(
         "Накинь еще фоточку для полного фарша"
