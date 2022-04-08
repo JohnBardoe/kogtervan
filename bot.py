@@ -25,7 +25,7 @@ import difflib
 ########STRUCTURE########
 REGISTER, SEARCH, ASK_PURPOSE, CITY_SELECT = range(4)
 SEARCH_JOB, SEARCH_RENT, SEARCH_PEOPLE, DELETE = range(4)
-HOBBY, JOB, PHOTO = range(3)
+JOB, PHOTO = range(3)
 EMPLOYEE, EMPLOYER = range(2)
 ROOM, ROOMMATE = range(2)
 AUTO, TAGS = range(2)
