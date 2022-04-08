@@ -115,20 +115,20 @@ def start_search(update: Update, context: CallbackContext) -> str:
             reply_markup=extra_tags_registered_button,
         )
         return SEARCH_PERSON
-   elif query_data == "RENT":
-       rent_button = InlineKeyboardMarkup(
-           [
-               InlineKeyboardButton("Сдать комнату", callback_data="RENT"),
-               InlineKeyboardButton(
-                   "Найти собственника", callback_data="ROOMMATE"
-               ),
-           ]
-       )
-       query.edit_message_text("Ты хочешь", reply_markup=rent_button)
-       return SEARCH_RENT
-        else:
-            # repeat this stage
-            return SEARCH
+    elif query_data == "RENT":
+        rent_button = InlineKeyboardMarkup(
+            [
+                InlineKeyboardButton("Сдать комнату", callback_data="RENT"),
+                InlineKeyboardButton(
+                    "Найти собственника", callback_data="ROOMMATE"
+                ),
+            ]
+        )
+        query.edit_message_text("Ты хочешь", reply_markup=rent_button)
+        return SEARCH_RENT
+    else:
+        # repeat this stage
+        return SEARCH
 
 
 def start(update: Update, context: CallbackContext) -> str:
@@ -161,14 +161,15 @@ def select_city(update: Update, context: CallbackContext) -> str:
         print(close_matches)
         keyboard = []
         for city in close_matches:
-            keyboard.append([InlineKeyboardButton(city["name"], callback_data=str(city["name"]))])
+            keyboard.append([InlineKeyboardButton(
+                city["name"], callback_data=str(city["name"]))])
         reply_markup = InlineKeyboardMarkup(keyboard)
         update.message.reply_text(
             "Найдено несколько городов. Выбери один из них", reply_markup=reply_markup
         )
         return CITY_SELECT
     # if there is only one result
-    if not query: 
+    if not query:
         city = close_matches[0]["name"]
     db.users.insert_one({"user_id": user_id}, {"$set": {"city_name": city}})
 
@@ -185,7 +186,8 @@ def select_city(update: Update, context: CallbackContext) -> str:
                     callback_data="REGISTER",
                 )
             ],
-            [InlineKeyboardButton("Я бы нашел кого себе...", callback_data="SEARCH")],
+            [InlineKeyboardButton("Я бы нашел кого себе...",
+                                  callback_data="SEARCH")],
         ]
     )
     query.edit_message_text(
@@ -228,7 +230,8 @@ def select_hobby(update: Update, context: CallbackContext) -> str:
         update.message.reply_text("Текст не должен быть длиннее 300 символов")
         return REGISTER
     elif len(hobby) == 0:
-        update.message.reply_text("Ладно, храни свои секреты. Но о рабочем опыте все-таки напиши.")
+        update.message.reply_text(
+            "Ладно, храни свои секреты. Но о рабочем опыте все-таки напиши.")
         return JOB
     db.users.update_one({"user_id": user_id}, {"$set": {"hobby": hobby}})
     update.message.reply_text(
@@ -260,7 +263,8 @@ def select_photo(update: Update, context: CallbackContext) -> str:
     file_id = photo.file_id
     db.users.update_one({"user_id": user_id}, {"$set": {"photo": file_id}})
     markup = InlineKeyboardMarkup(
-        [[InlineKeyboardButton("Бери с авы и не парься", callback_data="SKIP_PHOTO")]]
+        [[InlineKeyboardButton("Бери с авы и не парься",
+                               callback_data="SKIP_PHOTO")]]
     )
     update.message.reply_text(
         "Накинь еще фоточку для полного фарша", reply_markup=markup
@@ -287,7 +291,8 @@ def ask_job(update: Update, context: CallbackContext) -> str:
     # create 2 inline buttons
     markup = InlineKeyboardMarkup(
         [[InlineKeyboardButton("Хочу искать работу", callback_data="EMPLOYEE")]][
-            [InlineKeyboardButton("Хочу добавить вакансию", callback_data="EMPLOYER")]
+            [InlineKeyboardButton("Хочу добавить вакансию",
+                                  callback_data="EMPLOYER")]
         ]
     )
 
@@ -326,8 +331,6 @@ def select_room(update: Update, context: CallbackContext) -> str:
     room = update.message.text
 
     # select closest matching room from db by description
-
-
 
     return ConversationHandler.END
 
