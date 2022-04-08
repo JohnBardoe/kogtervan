@@ -83,19 +83,19 @@ def start_search(update: Update, context: CallbackContext) -> str:
 
     # if user is looking for job
     if query_data == "JOB":
-        # get user data
-        user_data = db.users.find_one({"user_id": user_id})
-        if "resume" in user_data:
-            resume = user_data["resume"]
-            similar_jobs = get_close_matches(db.jobs, "description", resume)
-            # if there are no similar jobs
-            if len(similar_jobs) == 0:
-                query.edit_message_text("Нет таких вакансий")
-                return SEARCH_JOB
-            # if there are similar jobs
-            else:
-                # get all jobs names
-                job_names = [job["name"] for job in similar_jobs]
+
+        markup = InlineKeyboardMarkup(
+            [[InlineKeyboardButton("Хочу искать работу", callback_data="EMPLOYEE")]][
+                [InlineKeyboardButton("Хочу добавить вакансию",
+                                      callback_data="EMPLOYER")]
+            ]
+        )
+
+        update.message.reply_text(
+            "Хочешь получать предложения о работе или добавлять вакансии?",
+            reply_markup=markup,
+        )
+        return SEARCH_JOB
 
     elif query_data == "PERSON":
         # create 2 inline buttons
@@ -269,7 +269,7 @@ def select_photo(update: Update, context: CallbackContext) -> str:
     update.message.reply_text(
         "Накинь еще фоточку для полного фарша", reply_markup=markup
     )
-    return ConversationHandler.END
+    return 
 
 
 def delete_user(update: Update, context: CallbackContext) -> str:
@@ -288,19 +288,35 @@ def cancel(update: Update, context: CallbackContext) -> str:
 
 def ask_job(update: Update, context: CallbackContext) -> str:
     user_id = update.message.from_user.id
-    # create 2 inline buttons
-    markup = InlineKeyboardMarkup(
-        [[InlineKeyboardButton("Хочу искать работу", callback_data="EMPLOYEE")]][
-            [InlineKeyboardButton("Хочу добавить вакансию",
-                                  callback_data="EMPLOYER")]
-        ]
-    )
+    # get query data
+    query = update.callback_query
+    query.answer()
 
-    update.message.reply_text(
-        "Хочешь получать предложения о работе или добавлять вакансии?",
-        reply_markup=markup,
-    )
-    return ConversationHandler.END
+    user = db.users.find_one({"user_id": user_id})
+
+    if query.data == "EMPLOYEE":
+        # if user with this id has resume in 
+        if user["job"] is not None:
+            query.edit_message_text(
+                "Ты уже написал о работе. Напиши еще о хобби."
+            )
+            return JOB
+        else:
+            query.edit_message_text(
+                "Напиши о работе. Напиши еще о хобби."
+            )
+            return JOB
+        pass
+    elif query.data == "EMPLOYER":
+        #search for jobs with this user_id
+        jobs = db.jobs.find({"user_id": user_id})
+        if len(jobs) == 0:
+            update.callback_query.message.reply_text(
+                "Cамое время создать свою первую вакансию! Напиши описание."
+            )
+        pass
+    else:
+        return ConversationHandler.END
 
 
 def select_employee(update: Update, context: CallbackContext) -> str:
@@ -361,6 +377,7 @@ def registerHandlers():
             TAGS: [MessageHandler(Filters.text, select_person_tags)],
         },
         fallbacks=[CommandHandler("cancel", cancel)],
+        map_to_parent= {REGISTER: REGISTER}
     )
 
     search_rent_handler = ConversationHandler(
@@ -370,6 +387,7 @@ def registerHandlers():
             ROOMMATE: [MessageHandler(Filters.text, select_roommate)],
         },
         fallbacks=[CommandHandler("cancel", cancel)],
+        map_to_parent= {REGISTER: REGISTER}
     )
 
     search_job_handler = ConversationHandler(
@@ -379,6 +397,7 @@ def registerHandlers():
             EMPLOYER: [CallbackQueryHandler(select_employer)],
         },
         fallbacks=[MessageHandler(Filters.text, cancel)],
+        map_to_parent= {REGISTER: REGISTER}
     )
 
     register_handler = ConversationHandler(
@@ -388,7 +407,7 @@ def registerHandlers():
             PHOTO: [MessageHandler(Filters.photo, select_photo)],
         },
         fallbacks=[CommandHandler("cancel", cancel)],
-        map_to_parent={REGISTER: REGISTER},
+        map_to_parent={REGISTER: REGISTER, SEARCH: SEARCH}
     )
 
     search_handler = ConversationHandler(
@@ -400,7 +419,7 @@ def registerHandlers():
             SEARCH_PEOPLE: [search_people_handler],
             DELETE: [MessageHandler(Filters.text, delete_user)],
         },
-        map_to_parent={SEARCH: SEARCH},
+        map_to_parent={SEARCH: SEARCH, REGISTER : REGISTER},
         fallbacks=[CommandHandler("cancel", cancel)],
     )
 
