@@ -164,7 +164,8 @@ def select_city(update: Update, context: CallbackContext) -> str:
         )
         return CITY_SELECT
     # if there is only one result
-    city = close_matches[0]["name"]
+    if not query: 
+        city = close_matches[0]["name"]
     db.users.insert_one({"user_id": user_id}, {"$set": {"city_name": city}})
 
     # save city to local context
