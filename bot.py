@@ -243,13 +243,15 @@ def select_hobby(update: Update, context: CallbackContext) -> str:
 def select_job(update: Update, context: CallbackContext) -> str:
     user_id = update.message.from_user.id
     job = update.message.text
+    
+    print("Selecting job, got:", job)
+
     # if message is longer than 300 symbols
     if len(update.message.text) > 300:
         update.message.reply_text("Текст не должен быть длиннее 300 символов")
         return JOB
-    elif len(update.message.text) == 0:
+    elif len(job) == 0:
         update.message.reply_text("Ладно, храни свои секреты")
-        return SKIP_HOBBY
     db.users.update_one({"user_id": user_id}, {"$set": {"job": job}})
     update.message.reply_text(
         "Накинь еще фоточку для полного фарша"
