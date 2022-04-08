@@ -235,7 +235,7 @@ def select_hobby(update: Update, context: CallbackContext) -> str:
         return REGISTER
     db.users.update_one({"user_id": user_id}, {"$set": {"hobby": hobby}})
     update.message.reply_text(
-        "Гуд! А теперь еще немного о том, откуда на хлеб берешь деньги.",
+        "Гуд! А теперь еще немного о том, откуда на хлеб берешь деньги."
     )
     print("ретерню джоб")
     return JOB
